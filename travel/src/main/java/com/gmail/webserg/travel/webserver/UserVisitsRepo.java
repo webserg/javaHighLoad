@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gmail.webserg.travel.domain.Location;
 import com.gmail.webserg.travel.domain.User;
 import com.gmail.webserg.travel.domain.Visit;
-import com.gmail.webserg.travel.webserver.handler.UserVisitsResponse;
 import com.networknt.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,14 +11,18 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.nio.file.StandardOpenOption.*;
 import static java.util.stream.Collectors.groupingBy;
@@ -49,7 +52,7 @@ public class UserVisitsRepo {
                 if (user == null) continue;
                 List<Visit> visitsList = userVisits.get(user.getId());
                 if (visitsList != null) {
-                    byte data[] = mapper.writeValueAsBytes(visitsList.stream().map(v -> map(v, locations)).collect(Collectors.toList()));
+                    byte data[] = mapper.writeValueAsBytes(visitsList);
                     user.setUserVisitsPosition(fc.position());
                     user.setUserVisitsSize(data.length);
                     ByteBuffer out = ByteBuffer.wrap(data);
@@ -61,14 +64,16 @@ public class UserVisitsRepo {
         }
     }
 
-
-    private UserVisitsResponse map(Visit v, List<Location> locations) {
-        String place = locations.get(v.getLocation()).getPlace();
-        if(place == null){
-            System.out.println(locations.get(v.getLocation()));
+    LocalDateTime readTime() {
+        try (Stream<String> stream = Files.lines(Paths.get(TravelConfig.PATH + "/options.txt"))) {
+            List<String> res = stream.collect(Collectors.toList());
+            return LocalDateTime.ofEpochSecond(Long.parseLong(res.get(1)), 0, ZoneOffset.UTC);
+        } catch (Throwable e) {
+            logger.error(e.getMessage());
+            return LocalDateTime.now(ZoneOffset.UTC);
         }
-        return new UserVisitsResponse(v.getMark(), v.getVisited_at(), place);
     }
+
 
     private byte[] readUserVisits(User user) {
         Set<OpenOption> options = new HashSet<>();
@@ -119,12 +124,12 @@ public class UserVisitsRepo {
         return Paths.get(TravelConfig.PATH + "/userVisits.data");
     }
 
-    Optional<List<UserVisitsResponse>> get(User user) {
+    Optional<List<Visit>> get(User user) {
         ObjectMapper mapper = new ObjectMapper();
         if (user.getUserVisitsSize() == 0) return Optional.of(new ArrayList<>());
         byte[] data = readUserVisits(user);
         try {
-            return Optional.of(mapper.readValue(data, mapper.getTypeFactory().constructCollectionLikeType(List.class, UserVisitsResponse.class)));
+            return Optional.of(mapper.readValue(data, mapper.getTypeFactory().constructCollectionLikeType(List.class, Visit.class)));
         } catch (Throwable e) {
             logger.error(e.getMessage());
             return Optional.empty();
