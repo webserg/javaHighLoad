@@ -2,7 +2,6 @@ package com.gmail.webserg.travel.webserver.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gmail.webserg.travel.domain.User;
-import com.google.common.collect.Lists;
 import com.networknt.client.Http2Client;
 import com.networknt.exception.ClientException;
 import io.undertow.UndertowOptions;
@@ -95,8 +94,8 @@ public class PathHandlerProviderTest {
             Assert.assertEquals( request.toString(),200, statusCode);
             Assert.assertNotNull(body);
             ObjectMapper mapper = new ObjectMapper();
-            List<UserVisitsResponse> userVisitsResponses = mapper.readValue(body, mapper.getTypeFactory().constructCollectionLikeType(List.class, UserVisitsResponse.class));
-            Assert.assertEquals(body, mapper.writeValueAsString(userVisitsResponses));
+            List<UserVisits> userVisitsRespons = mapper.readValue(body, mapper.getTypeFactory().constructCollectionLikeType(List.class, UserVisits.class));
+            Assert.assertEquals(body, mapper.writeValueAsString(userVisitsRespons));
 
         } catch (Exception e) {
             logger.error("Exception: ", e);

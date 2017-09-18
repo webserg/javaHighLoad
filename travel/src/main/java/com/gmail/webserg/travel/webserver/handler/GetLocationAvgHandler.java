@@ -1,8 +1,8 @@
 package com.gmail.webserg.travel.webserver.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gmail.webserg.travel.domain.User;
 import com.gmail.webserg.travel.webserver.DataBase;
-import com.networknt.config.Config;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
@@ -27,12 +27,18 @@ public class GetLocationAvgHandler implements HttpHandler {
                 exch.endExchange();
                 return;
             }
-            double resp = DataBase.getDb().getLocAvgResult(req.id, req);
+            Optional<User> user = DataBase.getDb().getUser(req.id);
+            if (!user.isPresent()) {
+                exch.setStatusCode(StatusCodes.NOT_FOUND);
+                exch.endExchange();
+                return;
+            }
+            double resp = DataBase.getDb().getLocAvgResult(user.get(), req);
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final ObjectMapper mapper = new ObjectMapper();
             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
             exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
-            mapper.writeValue(out, resp);
+            mapper.writeValue(out, new LocationAvgResponse(resp));
             exch.getResponseSender().send(ByteBuffer.wrap(out.toByteArray()));
             exch.endExchange();
         } catch (NumberFormatException ex) {

@@ -8,8 +8,8 @@ public final class User {
     private long birth_date;
     private String gender;
     private String email;
-    private long userVisitsPosition;
-    private int userVisitsSize;
+    private transient long userVisitsPosition;
+    private transient int userVisitsSize;
 
     public int getId() {
         return id;

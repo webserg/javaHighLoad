@@ -68,7 +68,7 @@ public class UserVisitsRepo {
     LocalDateTime readTime() {
         try (Stream<String> stream = Files.lines(Paths.get(TravelConfig.PATH + "/options.txt"))) {
             List<String> res = stream.collect(Collectors.toList());
-            return LocalDateTime.ofEpochSecond(Long.parseLong(res.get(1)), 0, ZoneOffset.UTC);
+            return LocalDateTime.ofEpochSecond(Long.parseLong(res.get(0)), 0, ZoneOffset.UTC);
         } catch (Throwable e) {
             logger.error(e.getMessage());
             return LocalDateTime.now(ZoneOffset.UTC);
@@ -125,15 +125,15 @@ public class UserVisitsRepo {
         return Paths.get(TravelConfig.PATH + "/userVisits.data");
     }
 
-    Optional<List<Visit>> get(User user) {
+    List<Visit> get(User user) {
         ObjectMapper mapper = new ObjectMapper();
-        if (user.getUserVisitsSize() == 0) return Optional.of(new ArrayList<>());
+        if (user.getUserVisitsSize() == 0) return new ArrayList<>();
         byte[] data = readUserVisits(user);
         try {
-            return Optional.of(mapper.readValue(data, mapper.getTypeFactory().constructCollectionLikeType(List.class, Visit.class)));
+            return mapper.readValue(data, mapper.getTypeFactory().constructCollectionLikeType(List.class, Visit.class));
         } catch (Throwable e) {
             logger.error(e.getMessage());
-            return Optional.empty();
         }
+        return new ArrayList<>();
     }
 }
