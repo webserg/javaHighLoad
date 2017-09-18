@@ -1,14 +1,14 @@
 package com.gmail.webserg.travel.webserver.handler;
 
-public class UserVisitsResponse {
+public class UserVisits {
     int mark;
     long visited_at;
     String place = "";
 
-    public UserVisitsResponse() {
+    public UserVisits() {
     }
 
-    public UserVisitsResponse(int mark, long visited_at, String place) {
+    public UserVisits(int mark, long visited_at, String place) {
         this.mark = mark;
         this.visited_at = visited_at;
         this.place = place;
@@ -40,7 +40,7 @@ public class UserVisitsResponse {
 
     @Override
     public String toString() {
-        return "UserVisitsResponse{" +
+        return "UserVisits{" +
                 "mark=" + mark +
                 ", visited_at=" + visited_at +
                 ", place='" + place + '\'' +

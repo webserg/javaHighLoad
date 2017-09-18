@@ -4,8 +4,8 @@ import com.gmail.webserg.travel.domain.Location;
 import com.gmail.webserg.travel.domain.User;
 import com.gmail.webserg.travel.domain.Visit;
 import com.gmail.webserg.travel.webserver.handler.LocationAvgRequest;
+import com.gmail.webserg.travel.webserver.handler.UserVisits;
 import com.gmail.webserg.travel.webserver.handler.UserVisitsRequest;
-import com.gmail.webserg.travel.webserver.handler.UserVisitsResponse;
 import com.networknt.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,28 +43,29 @@ public final class DataBase {
         }
     }
 
-    public Optional<List<UserVisitsResponse>> getUserVisits(int id, UserVisitsRequest req) {
-        Optional<List<Visit>> result = Optional.of(users.get(id)).flatMap(userVisitsRepo::get);
-        return result.map(r ->
-                r.stream().filter(v -> req.country == null || req.country.equals(locations.get(v.getLocation()).getCountry()))
+    public List<UserVisits> getUserVisits(User id, UserVisitsRequest req) {
+        List<Visit> result = userVisitsRepo.get(id);
+        return result.stream().filter(v -> req.country == null || req.country.equals(locations.get(v.getLocation()).getCountry()))
                         .filter(v -> req.fromDate == null || req.fromDate < v.getVisited_at())
                         .filter(v -> req.toDate == null || req.toDate > v.getVisited_at())
                         .filter(v -> req.toDistance == null || req.toDistance > locations.get(v.getLocation()).getDistance())
-                        .map(this::map).collect(Collectors.toList())
-        );
+                        .map(this::map).collect(Collectors.toList());
+
     }
 
-    public double getLocAvgResult(int id, LocationAvgRequest req) {
-        Optional<List<Visit>> result = Optional.of(users.get(id)).flatMap(userVisitsRepo::get);
-        Optional<List<Integer>> marks = result.map(r ->
-                r.stream().filter(v -> req.gender == null || req.gender.equals(users.get(id).getGender()))
-                        .filter(v -> req.fromDate == null || req.fromDate < v.getVisited_at())
-                        .filter(v -> req.toDate == null || req.toDate > v.getVisited_at())
-                        .filter(v -> req.fromAge == null || req.fromAge <= getAge(users.get(v.getUser()).getBirth_date()))
-                        .map(Visit::getMark).collect(Collectors.toList())
-        );
-
-        double avgTmp = marks.map(m -> m.stream().mapToDouble(Double::valueOf).sum() / m.size()).orElse(0.0);
+    public double getLocAvgResult(User user, LocationAvgRequest req) {
+        List<Visit> userVisits = userVisitsRepo.get(user);
+        if (userVisits.size() == 0) return 0.0;
+        long age = getAge(user.getBirth_date());
+        List<Integer> marks = userVisits.stream()
+                .filter(v -> req.gender == null || req.gender.equalsIgnoreCase(user.getGender()))
+                .filter(v -> req.fromDate == null || v.getVisited_at() > req.fromDate)
+                .filter(v -> req.toDate == null || v.getVisited_at() < req.toDate)
+                .filter(v -> req.fromAge == null || age >= req.fromAge)
+                .filter(v -> req.toAge == null || age < req.toAge)
+                .map(Visit::getMark).collect(Collectors.toList());
+        if(marks.size() == 0) return 0.0;
+        double avgTmp = marks.stream().mapToDouble(Double::valueOf).sum() / marks.size();
         return (new BigDecimal(avgTmp).setScale(5, BigDecimal.ROUND_HALF_UP)).doubleValue();
     }
 
@@ -74,12 +75,12 @@ public final class DataBase {
     }
 
 
-    private UserVisitsResponse map(Visit v) {
+    private UserVisits map(Visit v) {
         String place = locations.get(v.getLocation()).getPlace();
         if (place == null) {
             System.out.println(locations.get(v.getLocation()));
         }
-        return new UserVisitsResponse(v.getMark(), v.getVisited_at(), place);
+        return new UserVisits(v.getMark(), v.getVisited_at(), place);
     }
 
     public Optional<Location> getLocation(int id) {
@@ -101,9 +102,9 @@ public final class DataBase {
     }
 
 
-//    public List<UserVisitsResponse> getUserVisitsSize(int id, UserVisitsRequest req) {
-//        List<UserVisitsResponse> list = new ArrayList<>();
-//        list.add(new UserVisitsResponse(2, 958656902, "Кольский полуостров"));
+//    public List<UserVisits> getUserVisitsSize(int id, UserVisitsRequest req) {
+//        List<UserVisits> list = new ArrayList<>();
+//        list.add(new UserVisits(2, 958656902, "Кольский полуостров"));
 //        return list;
 //    }
 

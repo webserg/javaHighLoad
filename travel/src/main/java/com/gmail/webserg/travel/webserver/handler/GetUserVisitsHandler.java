@@ -1,6 +1,7 @@
 package com.gmail.webserg.travel.webserver.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gmail.webserg.travel.domain.User;
 import com.gmail.webserg.travel.webserver.DataBase;
 import com.networknt.config.Config;
 import io.undertow.server.HttpHandler;
@@ -42,23 +43,25 @@ public class GetUserVisitsHandler implements HttpHandler {
                 exch.endExchange();
                 return;
             }
-            Optional<List<UserVisitsResponse>> resp = DataBase.getDb().getUserVisits(req.id, req);
-            if (resp.isPresent()) {
-                final ByteArrayOutputStream out = new ByteArrayOutputStream();
-                final ObjectMapper mapper = new ObjectMapper();
-                exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-                exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
-                Object value = "{}";
-                if (!resp.get().isEmpty()) {
-                    value = resp.get();
-                }
-                mapper.writeValue(out, value);
-                exch.getResponseSender().send(ByteBuffer.wrap(out.toByteArray()));
+            Optional<User> user = DataBase.getDb().getUser(req.id);
+            if (!user.isPresent()) {
+                exch.setStatusCode(StatusCodes.NOT_FOUND);
                 exch.endExchange();
-            } else {
-                exch.setStatusCode(StatusCodes.BAD_REQUEST);
-                exch.endExchange();
+                return;
             }
+            List<UserVisits> resp = DataBase.getDb().getUserVisits(user.get(), req);
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            final ObjectMapper mapper = new ObjectMapper();
+            exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+            exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
+            Object value = "{}";
+            if (resp.size() != 0) {
+                value = new UserVisistsResponse(resp);
+            }
+            mapper.writeValue(out, value);
+            exch.getResponseSender().send(ByteBuffer.wrap(out.toByteArray()));
+            exch.endExchange();
+
         } catch (NumberFormatException ex) {
             exch.setStatusCode(StatusCodes.BAD_REQUEST);
             exch.endExchange();

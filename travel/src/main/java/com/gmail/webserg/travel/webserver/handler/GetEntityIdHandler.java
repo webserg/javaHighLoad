@@ -1,5 +1,6 @@
 package com.gmail.webserg.travel.webserver.handler;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.config.Config;
 import io.undertow.server.HttpHandler;
@@ -14,7 +15,10 @@ import java.util.Map;
 import java.util.Optional;
 
 public abstract class GetEntityIdHandler<T> implements HttpHandler {
-    private final ObjectMapper objectMapper = Config.getInstance().getMapper();
+
+    private final ObjectMapper objectMapper = Config.getInstance().
+            getMapper().configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true);
+
 
 
     @Override
