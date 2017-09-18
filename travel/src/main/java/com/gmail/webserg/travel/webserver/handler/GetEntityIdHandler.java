@@ -6,10 +6,8 @@ import com.networknt.config.Config;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import io.undertow.util.HttpString;
 import io.undertow.util.StatusCodes;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.Optional;
@@ -18,7 +16,6 @@ public abstract class GetEntityIdHandler<T> implements HttpHandler {
 
     private final ObjectMapper objectMapper = Config.getInstance().
             getMapper().configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true);
-
 
 
     @Override
@@ -37,6 +34,8 @@ public abstract class GetEntityIdHandler<T> implements HttpHandler {
             exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
             exch.getResponseSender().send(Utils.getMessage(jsonInString));
 
+        } catch (NumberFormatException ex) {
+            exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
         } catch (Throwable ex) {
             exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
         }

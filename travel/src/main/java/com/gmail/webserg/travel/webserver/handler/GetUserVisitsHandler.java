@@ -54,10 +54,7 @@ public class GetUserVisitsHandler implements HttpHandler {
             final ObjectMapper mapper = new ObjectMapper();
             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
             exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
-            Object value = "{}";
-            if (resp.size() != 0) {
-                value = new UserVisistsResponse(resp);
-            }
+            Object value = new UserVisistsResponse(resp);
             mapper.writeValue(out, value);
             exch.getResponseSender().send(ByteBuffer.wrap(out.toByteArray()));
             exch.endExchange();
