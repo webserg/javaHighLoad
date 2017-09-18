@@ -32,6 +32,7 @@ public class UserVisitsRepo {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
     void load(List<User> users, List<Location> locations, List<Visit> visits) throws Exception {
+        getPath().toFile().createNewFile();
         ObjectMapper mapper = new ObjectMapper();
         Set<OpenOption> options = new HashSet<>();
         options.add(CREATE);
