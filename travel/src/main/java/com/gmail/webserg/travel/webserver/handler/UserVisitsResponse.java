@@ -3,7 +3,10 @@ package com.gmail.webserg.travel.webserver.handler;
 public class UserVisitsResponse {
     int mark;
     long visited_at;
-    String place;
+    String place = "";
+
+    public UserVisitsResponse() {
+    }
 
     public UserVisitsResponse(int mark, long visited_at, String place) {
         this.mark = mark;
@@ -33,5 +36,14 @@ public class UserVisitsResponse {
 
     public void setPlace(String place) {
         this.place = place;
+    }
+
+    @Override
+    public String toString() {
+        return "UserVisitsResponse{" +
+                "mark=" + mark +
+                ", visited_at=" + visited_at +
+                ", place='" + place + '\'' +
+                '}';
     }
 }

@@ -46,4 +46,15 @@ public class Location {
     public void setDistance(int distance) {
         this.distance = distance;
     }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "id=" + id +
+                ", place='" + place + '\'' +
+                ", country='" + country + '\'' +
+                ", city='" + city + '\'' +
+                ", distance=" + distance +
+                '}';
+    }
 }

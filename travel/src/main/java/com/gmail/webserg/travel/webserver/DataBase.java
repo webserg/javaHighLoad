@@ -36,17 +36,8 @@ public final class DataBase {
     }
 
     public Optional<List<UserVisitsResponse>> getUserVisits(int id, UserVisitsRequest req) {
-        try {
-            Optional<User> user = Optional.of(users.get(id));
-            if (user.isPresent()) {
-                return Optional.of(userVisitsRepo.get(id));
-            } else {
-                return Optional.empty();
-            }
-        } catch (Throwable e) {
-            logger.error(e.getMessage());
-            return Optional.empty();
-        }
+
+        return Optional.of(users.get(id)).flatMap(userVisitsRepo::get);
     }
 
     public Optional<Location> getLocation(int id) {
@@ -68,7 +59,7 @@ public final class DataBase {
     }
 
 
-//    public List<UserVisitsResponse> getUserVisits(int id, UserVisitsRequest req) {
+//    public List<UserVisitsResponse> getUserVisitsSize(int id, UserVisitsRequest req) {
 //        List<UserVisitsResponse> list = new ArrayList<>();
 //        list.add(new UserVisitsResponse(2, 958656902, "Кольский полуостров"));
 //        return list;
@@ -102,7 +93,7 @@ public final class DataBase {
             visits = new ArrayList<>();
         }
         try {
-//            userVisitsRepo.load(users, locations, visits);
+            userVisitsRepo.load(users, locations, visits);
             System.gc();
         } catch (Exception e) {
             logger.error("userVisitsRepo wasn't loaded", e);

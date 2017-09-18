@@ -8,6 +8,8 @@ public final class User {
     private long birth_date;
     private String gender;
     private String email;
+    private long userVisitsPosition;
+    private int userVisitsSize;
 
     public int getId() {
         return id;
@@ -57,6 +59,14 @@ public final class User {
         this.email = email;
     }
 
+    public long getUserVisitsPosition() {
+        return userVisitsPosition;
+    }
+
+    public void setUserVisitsPosition(long userVisitsPosition) {
+        this.userVisitsPosition = userVisitsPosition;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -81,5 +91,13 @@ public final class User {
         result = 31 * result + gender.hashCode();
         result = 31 * result + email.hashCode();
         return result;
+    }
+
+    public int getUserVisitsSize() {
+        return userVisitsSize;
+    }
+
+    public void setUserVisitsSize(int userVisitsSize) {
+        this.userVisitsSize = userVisitsSize;
     }
 }

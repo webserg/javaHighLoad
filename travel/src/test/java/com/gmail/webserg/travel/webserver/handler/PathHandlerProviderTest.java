@@ -32,6 +32,12 @@ public class PathHandlerProviderTest {
             testGetUserById(ThreadLocalRandom.current().nextInt(1, 100123));
     }
 
+    @Test
+    public void testUsersVisits() throws Exception {
+        for (int i = 1; i < 100; i++)
+            testUsersVisitById(ThreadLocalRandom.current().nextInt(1, 100123));
+    }
+
     private void testGetUserById(int id) throws ClientException, java.io.IOException {
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -67,8 +73,7 @@ public class PathHandlerProviderTest {
 
     }
 
-    @Test
-    public void testUsersVisit(int id) throws ClientException, java.io.IOException {
+    public void testUsersVisitById(int id) throws ClientException, java.io.IOException {
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
@@ -87,11 +92,11 @@ public class PathHandlerProviderTest {
 
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
-            Assert.assertEquals(200, statusCode);
+            Assert.assertEquals( request.toString(),200, statusCode);
             Assert.assertNotNull(body);
             ObjectMapper mapper = new ObjectMapper();
             List<UserVisitsResponse> userVisitsResponses = mapper.readValue(body, mapper.getTypeFactory().constructCollectionLikeType(List.class, UserVisitsResponse.class));
-            Assert.assertEquals(Lists.newArrayList(), userVisitsResponses);
+            Assert.assertEquals(body, mapper.writeValueAsString(userVisitsResponses));
 
         } catch (Exception e) {
             logger.error("Exception: ", e);
