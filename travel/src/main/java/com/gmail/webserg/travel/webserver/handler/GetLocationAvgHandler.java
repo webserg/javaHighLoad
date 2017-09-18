@@ -1,6 +1,7 @@
 package com.gmail.webserg.travel.webserver.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gmail.webserg.travel.domain.Location;
 import com.gmail.webserg.travel.domain.User;
 import com.gmail.webserg.travel.webserver.DataBase;
 import io.undertow.server.HttpHandler;
@@ -27,13 +28,13 @@ public class GetLocationAvgHandler implements HttpHandler {
                 exch.endExchange();
                 return;
             }
-            Optional<User> user = DataBase.getDb().getUser(req.id);
-            if (!user.isPresent()) {
+            Optional<Location> location = DataBase.getDb().getLocation(req.id);
+            if (!location.isPresent()) {
                 exch.setStatusCode(StatusCodes.NOT_FOUND);
                 exch.endExchange();
                 return;
             }
-            double resp = DataBase.getDb().getLocAvgResult(user.get(), req);
+            double resp = DataBase.getDb().getLocAvgResult(location.get(), req);
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final ObjectMapper mapper = new ObjectMapper();
             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");

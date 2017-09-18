@@ -6,6 +6,8 @@ public class Location {
     String country;
     String city;
     int distance;
+    transient long visitsPosition;
+    transient int visitsSize;
 
     public int getId() {
         return id;
@@ -45,6 +47,22 @@ public class Location {
 
     public void setDistance(int distance) {
         this.distance = distance;
+    }
+
+    public void setVisitsPosition(long visitsPosition) {
+        this.visitsPosition = visitsPosition;
+    }
+
+    public void setVisitsSize(int visitsSize) {
+        this.visitsSize = visitsSize;
+    }
+
+    public long getVisitsPosition() {
+        return visitsPosition;
+    }
+
+    public int getVisitsSize() {
+        return visitsSize;
     }
 
     @Override
