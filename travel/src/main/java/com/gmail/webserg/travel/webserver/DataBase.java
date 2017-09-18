@@ -28,6 +28,7 @@ public final class DataBase {
     private List<Visit> visits;
     private static final DataBase db = new DataBase();
     private final UserVisitsRepo userVisitsRepo = new UserVisitsRepo();
+    private final LocationVisitsRepo locVisitsRepo = new LocationVisitsRepo();
     private LocalDateTime generationDateTime;
 
     public static DataBase getDb() {
@@ -46,26 +47,29 @@ public final class DataBase {
     public List<UserVisits> getUserVisits(User id, UserVisitsRequest req) {
         List<Visit> result = userVisitsRepo.get(id);
         return result.stream().filter(v -> req.country == null || req.country.equals(locations.get(v.getLocation()).getCountry()))
-                        .filter(v -> req.fromDate == null || req.fromDate < v.getVisited_at())
-                        .filter(v -> req.toDate == null || req.toDate > v.getVisited_at())
-                        .filter(v -> req.toDistance == null || req.toDistance > locations.get(v.getLocation()).getDistance())
-                        .map(this::map).collect(Collectors.toList());
+                .filter(v -> req.fromDate == null || req.fromDate < v.getVisited_at())
+                .filter(v -> req.toDate == null || req.toDate > v.getVisited_at())
+                .filter(v -> req.toDistance == null || req.toDistance > locations.get(v.getLocation()).getDistance())
+                .map(this::map).collect(Collectors.toList());
 
     }
 
-    public double getLocAvgResult(User user, LocationAvgRequest req) {
-        List<Visit> userVisits = userVisitsRepo.get(user);
+    public double getLocAvgResult(Location location, LocationAvgRequest req) {
+        List<Visit> userVisits = locVisitsRepo.get(location);
         if (userVisits.size() == 0) return 0.0;
-        long age = getAge(user.getBirth_date());
         List<Integer> marks = userVisits.stream()
-                .filter(v -> req.gender == null || req.gender.equalsIgnoreCase(user.getGender()))
+                .filter(v -> req.gender == null || req.gender.equalsIgnoreCase(users.get(v.getUser()).getGender()))
                 .filter(v -> req.fromDate == null || v.getVisited_at() > req.fromDate)
                 .filter(v -> req.toDate == null || v.getVisited_at() < req.toDate)
-                .filter(v -> req.fromAge == null || age >= req.fromAge)
-                .filter(v -> req.toAge == null || age < req.toAge)
+                .filter(v -> req.fromAge == null || getAge(users.get(v.getUser()).getBirth_date()) >= req.fromAge)
+                .filter(v -> req.toAge == null || getAge(users.get(v.getUser()).getBirth_date()) < req.toAge)
                 .map(Visit::getMark).collect(Collectors.toList());
-        if(marks.size() == 0) return 0.0;
-        double avgTmp = marks.stream().mapToDouble(Double::valueOf).sum() / marks.size();
+        if (marks.size() == 0) return 0.0;
+        int sum = 0;
+        for (int m : marks) {
+            sum += m;
+        }
+        double avgTmp = sum / marks.size();
         return (new BigDecimal(avgTmp).setScale(5, BigDecimal.ROUND_HALF_UP)).doubleValue();
     }
 
@@ -136,7 +140,8 @@ public final class DataBase {
             visits = new ArrayList<>();
         }
         try {
-            userVisitsRepo.load(users, locations, visits);
+            userVisitsRepo.load(users, visits);
+            locVisitsRepo.load(locations, visits);
             generationDateTime = userVisitsRepo.readTime();
             System.gc();
         } catch (Exception e) {
