@@ -32,7 +32,6 @@ public class GetUserVisitsHandler implements HttpHandler {
     }
 
     @Override
-
     public void handleRequest(HttpServerExchange exch) throws Exception {
         final Map q = exch.getQueryParameters();
         try {
