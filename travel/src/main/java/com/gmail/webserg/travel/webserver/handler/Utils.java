@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public final class Utils {
     public static String dataPath = System.getenv("DATA_HOME");
+    public static String optionsPath = "/tmp/data";
 
     public static Optional<String> toString(ArrayDeque<String> arrayDeque) {
         if (arrayDeque == null) return Optional.empty();

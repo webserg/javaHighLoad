@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gmail.webserg.travel.domain.Location;
 import com.gmail.webserg.travel.domain.User;
 import com.gmail.webserg.travel.domain.Visit;
+import com.gmail.webserg.travel.webserver.handler.Utils;
 import com.networknt.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +67,7 @@ public class UserVisitsRepo {
     }
 
     LocalDateTime readTime() {
-        try (Stream<String> stream = Files.lines(Paths.get(TravelConfig.PATH + "/options.txt"))) {
+        try (Stream<String> stream = Files.lines(Paths.get(Utils.optionsPath + "/options.txt"))) {
             List<String> res = stream.collect(Collectors.toList());
             return LocalDateTime.ofEpochSecond(Long.parseLong(res.get(0)), 0, ZoneOffset.UTC);
         } catch (Throwable e) {
