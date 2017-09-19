@@ -1,4 +1,4 @@
-package com.gmail.webserg.travel.webserver.handler;
+package com.gmail.webserg.travel.webserver.params;
 
 public class LocationAvgResponse {
     private Double avg;

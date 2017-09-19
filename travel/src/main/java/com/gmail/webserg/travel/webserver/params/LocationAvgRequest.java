@@ -1,4 +1,4 @@
-package com.gmail.webserg.travel.webserver.handler;
+package com.gmail.webserg.travel.webserver.params;
 
 public final class LocationAvgRequest {
     public final Integer id ;

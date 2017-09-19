@@ -2,6 +2,7 @@ package com.gmail.webserg.travel.webserver.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gmail.webserg.travel.domain.User;
+import com.gmail.webserg.travel.domain.UserVisits;
 import com.networknt.client.Http2Client;
 import com.networknt.exception.ClientException;
 import io.undertow.UndertowOptions;
@@ -86,6 +87,49 @@ public class PathHandlerProviderTest {
             final AtomicReference<ClientResponse> reference = new AtomicReference<>();
 
             connection.sendRequest(request, client.createClientCallback(reference, latch));
+
+            latch.await();
+
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals( request.toString(),200, statusCode);
+            Assert.assertNotNull(body);
+            ObjectMapper mapper = new ObjectMapper();
+            List<UserVisits> userVisitsRespons = mapper.readValue(body, mapper.getTypeFactory().constructCollectionLikeType(List.class, UserVisits.class));
+            Assert.assertEquals(body, mapper.writeValueAsString(userVisitsRespons));
+
+        } catch (Exception e) {
+            logger.error("Exception: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+
+    }
+
+    @Test
+    public void testPostUsersVisit() throws ClientException, java.io.IOException {
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, false ? OptionMap.create(UndertowOptions.ENABLE_HTTP2, true) : OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+        try {
+            ClientRequest request = new ClientRequest().setPath("/users/new/").setMethod(Methods.POST);
+
+            final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+
+            connection.sendRequest(request, client.createClientCallback(reference, latch, "{\n" +
+                    "        \"id\": 245000,\n" +
+                    "        \"email\": \"foobar@mail.ru\",\n" +
+                    "        \"first_name\": \"Маша\",\n" +
+                    "        \"last_name\": \"Пушкина\",\n" +
+                    "        \"gender\": \"f\",\n" +
+                    "        \"birth_date\": 365299200\n" +
+                    "    }"));
 
             latch.await();
 

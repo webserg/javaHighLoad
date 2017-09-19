@@ -9,6 +9,14 @@ public class Location {
     transient long visitsPosition;
     transient int visitsSize;
 
+    public Location(int id, String place, String country, String city, int distance) {
+        this.id = id;
+        this.place = place;
+        this.country = country;
+        this.city = city;
+        this.distance = distance;
+    }
+
     public int getId() {
         return id;
     }
@@ -74,5 +82,12 @@ public class Location {
                 ", city='" + city + '\'' +
                 ", distance=" + distance +
                 '}';
+    }
+
+    public synchronized void update(String country, String city, String place, Integer distance) {
+        if(country != null) this.country = country;
+        if(city != null) this.city = city;
+        if(place != null) this.place = place;
+        if(distance != null) this.distance = distance;
     }
 }

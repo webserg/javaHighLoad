@@ -1,4 +1,4 @@
-package com.gmail.webserg.travel.webserver.handler;
+package com.gmail.webserg.travel.domain;
 
 public class UserVisits {
     int mark;

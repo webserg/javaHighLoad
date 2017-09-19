@@ -22,8 +22,11 @@ public class PathHandlerProvider implements HandlerProvider {
                 .add(Methods.GET, "/locations/{id}", new GetLocationHandler())
                 .add(Methods.GET, "/locations/{id}/avg", new GetLocationAvgHandler())
                 .add(Methods.GET, "/visits/{id}", new GetVisitHandler())
-                .add(Methods.POST, "/users/{id}", new PostEntityIdHandler())
-                .add(Methods.POST, "/locations/{id}", new PostEntityIdHandler())
-                .add(Methods.POST, "/visits/{id}", new PostEntityIdHandler());
+                .add(Methods.POST, "/users/{id}", new PostUpdateUserHandler())
+                .add(Methods.POST, "/locations/{id}", new PostUpdateLocationHandler())
+                .add(Methods.POST, "/visits/{id}", new PostEntityIdHandler())
+                .add(Methods.POST, "/users/new", new PostNewUserHandler())
+                .add(Methods.POST, "/locations/new", new PostNewLocationHandler())
+                .add(Methods.POST, "/visits/new", new PostNewVisitHandler());
     }
 }

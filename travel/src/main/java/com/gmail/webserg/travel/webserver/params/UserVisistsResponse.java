@@ -1,4 +1,6 @@
-package com.gmail.webserg.travel.webserver.handler;
+package com.gmail.webserg.travel.webserver.params;
+
+import com.gmail.webserg.travel.domain.UserVisits;
 
 import java.util.Comparator;
 import java.util.List;
