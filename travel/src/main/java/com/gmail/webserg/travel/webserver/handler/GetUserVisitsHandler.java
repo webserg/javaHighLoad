@@ -2,7 +2,10 @@ package com.gmail.webserg.travel.webserver.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gmail.webserg.travel.domain.User;
+import com.gmail.webserg.travel.domain.UserVisits;
 import com.gmail.webserg.travel.webserver.DataBase;
+import com.gmail.webserg.travel.webserver.params.UserVisistsResponse;
+import com.gmail.webserg.travel.webserver.params.UserVisitsRequest;
 import com.networknt.config.Config;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;

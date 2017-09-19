@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -33,10 +34,9 @@ public class UserVisitsRepo {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
     void load(List<User> users, List<Visit> visits) throws Exception {
-        getPath().toFile().createNewFile();
         ObjectMapper mapper = new ObjectMapper();
         Set<OpenOption> options = new HashSet<>();
-        options.add(CREATE);
+        options.add(CREATE_NEW);
         options.add(WRITE);
         Set<PosixFilePermission> perms =
                 PosixFilePermissions.fromString("rw-r-----");
@@ -98,22 +98,31 @@ public class UserVisitsRepo {
         return copy.array();
     }
 
-    boolean appendUserVisits(User user, ByteBuffer out) {
+    boolean appendUserVisits(User user, List<Visit> visits) {
+        ObjectMapper mapper = new ObjectMapper();
         Set<OpenOption> options = new HashSet<>();
         options.add(APPEND);
-        options.add(READ);
-        options.add(WRITE);
         Set<PosixFilePermission> perms =
                 PosixFilePermissions.fromString("r--r-----");
         FileAttribute<Set<PosixFilePermission>> attr =
                 PosixFilePermissions.asFileAttribute(perms);
         try (FileChannel fc = (FileChannel.open(getPath(), options))) {
-            long length = fc.size();
-            fc.position(length - 1);
-            user.setUserVisitsPosition(length - 1);
-            user.setUserVisitsSize(out.array().length);
-            while (out.hasRemaining())
-                fc.write(out);
+            byte data[] = mapper.writeValueAsBytes(visits);
+            ByteBuffer out = ByteBuffer.wrap(data);
+            long position = fc.size() - 1;
+            long size = out.array().length;
+            fc.position(position);
+            FileLock lock = fc.lock(position, size, true);
+            synchronized (user) {
+                user.setUserVisitsPosition(position);
+                user.setUserVisitsSize(out.array().length);
+            }
+            try {
+                while (out.hasRemaining())
+                    fc.write(out);
+            } finally {
+                lock.release();
+            }
         } catch (IOException x) {
             System.out.println("I/O Exception: " + x);
             return false;

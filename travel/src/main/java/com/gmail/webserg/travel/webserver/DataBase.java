@@ -2,10 +2,9 @@ package com.gmail.webserg.travel.webserver;
 
 import com.gmail.webserg.travel.domain.Location;
 import com.gmail.webserg.travel.domain.User;
+import com.gmail.webserg.travel.domain.UserVisits;
 import com.gmail.webserg.travel.domain.Visit;
-import com.gmail.webserg.travel.webserver.handler.LocationAvgRequest;
-import com.gmail.webserg.travel.webserver.handler.UserVisits;
-import com.gmail.webserg.travel.webserver.handler.UserVisitsRequest;
+import com.gmail.webserg.travel.webserver.params.*;
 import com.networknt.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +64,7 @@ public final class DataBase {
                 .filter(v -> req.toAge == null || getAge(users.get(v.getUser()).getBirth_date()) < req.toAge)
                 .map(Visit::getMark).collect(Collectors.toList());
         if (marks.size() == 0) return 0.0;
-        int sum = 0;
+        double sum = 0.0;
         for (int m : marks) {
             sum += m;
         }
@@ -147,5 +146,78 @@ public final class DataBase {
         } catch (Exception e) {
             logger.error("userVisitsRepo wasn't loaded", e);
         }
+    }
+
+    public void addUser(UserPostQueryParam q) {
+        User newUser = new User(q.id, q.first_name, q.last_name, q.birth_date, q.gender, q.email);
+        synchronized (users) {
+            users.add(q.id, newUser);
+        }
+    }
+
+    public void addLocation(LocationPostQueryParam q) {
+        Location newLocation = new Location(q.id, q.country, q.city, q.place, q.distance);
+        synchronized (locations) {
+            locations.add(q.id, newLocation);
+        }
+    }
+
+    public void addVisit(VisitPostQueryParam q) {
+        Visit newVisit = new Visit(q.id, q.location, q.user, q.visited_at, q.mark);
+        synchronized (visits) {
+            visits.add(q.id, newVisit);
+        }
+        User user = users.get(newVisit.getUser());
+        List<Visit> userVisits = userVisitsRepo.get(user);
+        userVisits.add(newVisit);
+        userVisitsRepo.appendUserVisits(user, userVisits);
+        Location location = locations.get(newVisit.getLocation());
+        List<Visit> locationVisits = locVisitsRepo.get(location);
+        locationVisits.add(newVisit);
+        locVisitsRepo.appendLocationVisits(location, locationVisits);
+    }
+
+    public void updateUser(final User user, UserPostQueryParam q) {
+        user.update(q.first_name, q.last_name, q.birth_date, q.gender, q.email);
+    }
+
+    public void updateLocation(Location location, LocationPostQueryParam q) {
+        location.update(q.country, q.city, q.place, q.distance);
+    }
+
+    public void updateVisit(Visit v, VisitPostQueryParam q) {
+        Visit newVisit = new Visit(
+                v.getId(),
+                q.location == null ? q.location : v.getLocation(),
+                q.user == null ? q.user : v.getUser(),
+                q.visited_at == null ? q.visited_at : v.getVisited_at(),
+                q.mark == null ? q.mark : v.getMark());
+
+        if (v.equals(newVisit)) return;
+
+        synchronized (visits) {
+            visits.set(q.id, newVisit);
+        }
+        if (newVisit.getUser() == v.getUser()) {
+            User user = users.get(v.getUser());
+            List<Visit> userVisits = userVisitsRepo.get(user);
+            userVisits.remove(v);
+            userVisits.add(newVisit);
+            userVisitsRepo.appendUserVisits(user, userVisits);
+        } else {
+            User user = users.get(v.getUser());
+            List<Visit> userVisits = userVisitsRepo.get(user);
+            userVisits.remove(v);
+            userVisitsRepo.appendUserVisits(user, userVisits);
+
+            User newUser = users.get(newVisit.getUser());
+            List<Visit> newUserVisits = userVisitsRepo.get(user);
+            newUserVisits.remove(v);
+            userVisitsRepo.appendUserVisits(newUser, newUserVisits);
+        }
+//        Location location = locations.get(newVisit.getLocation());
+//        List<Visit> locationVisits = locVisitsRepo.get(location);
+//        locationVisits.add(newVisit);
+//        locVisitsRepo.appendLocationVisits(location, locationVisits);
     }
 }

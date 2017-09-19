@@ -11,6 +11,15 @@ public final class User {
     private transient long userVisitsPosition;
     private transient int userVisitsSize;
 
+    public User(int id, String first_name, String last_name, long birth_date, String gender, String email) {
+        this.id = id;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.birth_date = birth_date;
+        this.gender = gender;
+        this.email = email;
+    }
+
     public int getId() {
         return id;
     }
@@ -99,5 +108,13 @@ public final class User {
 
     public void setUserVisitsSize(int userVisitsSize) {
         this.userVisitsSize = userVisitsSize;
+    }
+
+    public synchronized void update(String first_name, String last_name, Long birth_date, String gender, String email) {
+        if(first_name != null) this.first_name = first_name;
+        if(last_name != null) this.last_name = last_name;
+        if(birth_date != null) this.birth_date = birth_date;
+        if(gender != null) this.gender = gender;
+        if(email != null) this.email = email;
     }
 }

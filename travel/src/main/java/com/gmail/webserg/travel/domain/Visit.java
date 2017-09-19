@@ -7,6 +7,14 @@ public class Visit {
     long visited_at;
     int mark;
 
+    public Visit(int id, int location, int user, long visited_at, int mark) {
+        this.id = id;
+        this.location = location;
+        this.user = user;
+        this.visited_at = visited_at;
+        this.mark = mark;
+    }
+
     public int getId() {
         return id;
     }
@@ -45,5 +53,29 @@ public class Visit {
 
     public void setMark(int mark) {
         this.mark = mark;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Visit visit = (Visit) o;
+
+        if (id != visit.id) return false;
+        if (location != visit.location) return false;
+        if (user != visit.user) return false;
+        if (visited_at != visit.visited_at) return false;
+        return mark == visit.mark;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + location;
+        result = 31 * result + user;
+        result = 31 * result + (int) (visited_at ^ (visited_at >>> 32));
+        result = 31 * result + mark;
+        return result;
     }
 }

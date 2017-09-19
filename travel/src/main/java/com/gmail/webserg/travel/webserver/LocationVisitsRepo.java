@@ -2,7 +2,6 @@ package com.gmail.webserg.travel.webserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gmail.webserg.travel.domain.Location;
-import com.gmail.webserg.travel.domain.User;
 import com.gmail.webserg.travel.domain.Visit;
 import com.networknt.server.Server;
 import org.slf4j.Logger;
@@ -11,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,7 +82,8 @@ public class LocationVisitsRepo {
         return copy.array();
     }
 
-    boolean appendUserVisits(User user, ByteBuffer out) {
+    boolean appendLocationVisits(Location location, List<Visit> visits) {
+        ObjectMapper mapper = new ObjectMapper();
         Set<OpenOption> options = new HashSet<>();
         options.add(APPEND);
         options.add(READ);
@@ -92,12 +93,22 @@ public class LocationVisitsRepo {
         FileAttribute<Set<PosixFilePermission>> attr =
                 PosixFilePermissions.asFileAttribute(perms);
         try (FileChannel fc = (FileChannel.open(getPath(), options))) {
-            long length = fc.size();
-            fc.position(length - 1);
-            user.setUserVisitsPosition(length - 1);
-            user.setUserVisitsSize(out.array().length);
-            while (out.hasRemaining())
-                fc.write(out);
+            byte data[] = mapper.writeValueAsBytes(visits);
+            ByteBuffer out = ByteBuffer.wrap(data);
+            long position = fc.size() - 1;
+            long size = out.array().length;
+            fc.position(position);
+            FileLock lock = fc.lock(position, size, true);
+            synchronized (location) {
+                location.setVisitsPosition(position);
+                location.setVisitsSize(out.array().length);
+            }
+            try {
+                while (out.hasRemaining())
+                    fc.write(out);
+            } finally {
+                lock.release();
+            }
         } catch (IOException x) {
             System.out.println("I/O Exception: " + x);
             return false;
