@@ -90,4 +90,25 @@ public class Location {
         if(place != null) this.place = place;
         if(distance != null) this.distance = distance;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Location location = (Location) o;
+
+        if (id != location.id) return false;
+        if (distance != location.distance) return false;
+        if (visitsPosition != location.visitsPosition) return false;
+        if (visitsSize != location.visitsSize) return false;
+        if (place != null ? !place.equals(location.place) : location.place != null) return false;
+        if (country != null ? !country.equals(location.country) : location.country != null) return false;
+        return city != null ? city.equals(location.city) : location.city == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
 }

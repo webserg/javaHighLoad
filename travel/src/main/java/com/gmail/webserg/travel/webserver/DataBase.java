@@ -15,7 +15,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.YEARS;
@@ -23,8 +25,11 @@ import static java.time.temporal.ChronoUnit.YEARS;
 public final class DataBase {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
     private List<User> users;
+    private Map<Integer, User> newUsers = new ConcurrentHashMap<>();
     private List<Location> locations;
+    private Map<Integer, Location> newLocations = new ConcurrentHashMap<>();
     private List<Visit> visits;
+    private Map<Integer, Visit> newVisits = new ConcurrentHashMap<>();
     private static final DataBase db = new DataBase();
     private final UserVisitsRepo userVisitsRepo = new UserVisitsRepo();
     private final LocationVisitsRepo locVisitsRepo = new LocationVisitsRepo();
@@ -36,19 +41,37 @@ public final class DataBase {
 
     public Optional<User> getUser(int id) {
         try {
-            return Optional.of(users.get(id));
+            return Optional.of(users(id));
         } catch (Throwable e) {
             logger.error(e.getMessage());
             return Optional.empty();
         }
     }
 
-    public List<UserVisits> getUserVisits(User id, UserVisitsRequest req) {
-        List<Visit> result = userVisitsRepo.get(id);
-        return result.stream().filter(v -> req.country == null || req.country.equals(locations.get(v.getLocation()).getCountry()))
+    private User users(int id) {
+        if (id < users.size())
+            return users.get(id);
+        return newUsers.get(id);
+    }
+
+    private Location locations(int id) {
+        if (id < locations.size())
+            return locations.get(id);
+        return newLocations.get(id);
+    }
+
+    private Visit visits(int id) {
+        if (id < visits.size())
+            return visits.get(id);
+        return newVisits.get(id);
+    }
+
+    public List<UserVisits> getUserVisits(User user, UserVisitsRequest req) {
+        List<Visit> result = userVisitsRepo.get(user);
+        return result.stream().filter(v -> req.country == null || req.country.equals(locations(v.getLocation()).getCountry()))
                 .filter(v -> req.fromDate == null || req.fromDate < v.getVisited_at())
                 .filter(v -> req.toDate == null || req.toDate > v.getVisited_at())
-                .filter(v -> req.toDistance == null || req.toDistance > locations.get(v.getLocation()).getDistance())
+                .filter(v -> req.toDistance == null || req.toDistance > locations(v.getLocation()).getDistance())
                 .map(this::map).collect(Collectors.toList());
 
     }
@@ -57,11 +80,11 @@ public final class DataBase {
         List<Visit> userVisits = locVisitsRepo.get(location);
         if (userVisits.size() == 0) return 0.0;
         List<Integer> marks = userVisits.stream()
-                .filter(v -> req.gender == null || req.gender.equalsIgnoreCase(users.get(v.getUser()).getGender()))
+                .filter(v -> req.gender == null || req.gender.equalsIgnoreCase(users(v.getUser()).getGender()))
                 .filter(v -> req.fromDate == null || v.getVisited_at() > req.fromDate)
                 .filter(v -> req.toDate == null || v.getVisited_at() < req.toDate)
-                .filter(v -> req.fromAge == null || getAge(users.get(v.getUser()).getBirth_date()) >= req.fromAge)
-                .filter(v -> req.toAge == null || getAge(users.get(v.getUser()).getBirth_date()) < req.toAge)
+                .filter(v -> req.fromAge == null || getAge(users(v.getUser()).getBirth_date()) >= req.fromAge)
+                .filter(v -> req.toAge == null || getAge(users(v.getUser()).getBirth_date()) < req.toAge)
                 .map(Visit::getMark).collect(Collectors.toList());
         if (marks.size() == 0) return 0.0;
         double sum = 0.0;
@@ -79,16 +102,13 @@ public final class DataBase {
 
 
     private UserVisits map(Visit v) {
-        String place = locations.get(v.getLocation()).getPlace();
-        if (place == null) {
-            System.out.println(locations.get(v.getLocation()));
-        }
+        String place = locations(v.getLocation()).getPlace();
         return new UserVisits(v.getMark(), v.getVisited_at(), place);
     }
 
     public Optional<Location> getLocation(int id) {
         try {
-            return Optional.of(locations.get(id));
+            return Optional.of(locations(id));
         } catch (Throwable e) {
             logger.error(e.getMessage());
             return Optional.empty();
@@ -97,7 +117,7 @@ public final class DataBase {
 
     public Optional<Visit> getVisit(int id) {
         try {
-            return Optional.of(visits.get(id));
+            return Optional.of(visits(id));
         } catch (Throwable e) {
             logger.error(e.getMessage());
             return Optional.empty();
@@ -150,28 +170,22 @@ public final class DataBase {
 
     public void addUser(UserPostQueryParam q) {
         User newUser = new User(q.id, q.first_name, q.last_name, q.birth_date, q.gender, q.email);
-        synchronized (users) {
-            users.add(q.id, newUser);
-        }
+        newUsers.put(q.id, newUser);
     }
 
     public void addLocation(LocationPostQueryParam q) {
         Location newLocation = new Location(q.id, q.country, q.city, q.place, q.distance);
-        synchronized (locations) {
-            locations.add(q.id, newLocation);
-        }
+        newLocations.put(q.id, newLocation);
     }
 
     public void addVisit(VisitPostQueryParam q) {
         Visit newVisit = new Visit(q.id, q.location, q.user, q.visited_at, q.mark);
-        synchronized (visits) {
-            visits.add(q.id, newVisit);
-        }
-        User user = users.get(newVisit.getUser());
+        newVisits.put(q.id, newVisit);
+        User user = users(newVisit.getUser());
         List<Visit> userVisits = userVisitsRepo.get(user);
         userVisits.add(newVisit);
         userVisitsRepo.appendUserVisits(user, userVisits);
-        Location location = locations.get(newVisit.getLocation());
+        Location location = locations(newVisit.getLocation());
         List<Visit> locationVisits = locVisitsRepo.get(location);
         locationVisits.add(newVisit);
         locVisitsRepo.appendLocationVisits(location, locationVisits);
@@ -185,39 +199,50 @@ public final class DataBase {
         location.update(q.country, q.city, q.place, q.distance);
     }
 
-    public void updateVisit(Visit v, VisitPostQueryParam q) {
+    public void updateVisit(Visit oldVisit, VisitPostQueryParam q) {
         Visit newVisit = new Visit(
-                v.getId(),
-                q.location == null ? q.location : v.getLocation(),
-                q.user == null ? q.user : v.getUser(),
-                q.visited_at == null ? q.visited_at : v.getVisited_at(),
-                q.mark == null ? q.mark : v.getMark());
+                oldVisit.getId(),
+                q.location == null ? q.location : oldVisit.getLocation(),
+                q.user == null ? q.user : oldVisit.getUser(),
+                q.visited_at == null ? q.visited_at : oldVisit.getVisited_at(),
+                q.mark == null ? q.mark : oldVisit.getMark());
 
-        if (v.equals(newVisit)) return;
+        if (oldVisit.equals(newVisit)) return;
 
-        synchronized (visits) {
-            visits.set(q.id, newVisit);
-        }
-        if (newVisit.getUser() == v.getUser()) {
-            User user = users.get(v.getUser());
+        if (newVisit.getUser() == oldVisit.getUser()) {
+            User user = users(oldVisit.getUser());
             List<Visit> userVisits = userVisitsRepo.get(user);
-            userVisits.remove(v);
+            userVisits.remove(oldVisit);
             userVisits.add(newVisit);
             userVisitsRepo.appendUserVisits(user, userVisits);
         } else {
-            User user = users.get(v.getUser());
+            User user = users(oldVisit.getUser());
             List<Visit> userVisits = userVisitsRepo.get(user);
-            userVisits.remove(v);
+            userVisits.remove(oldVisit);
             userVisitsRepo.appendUserVisits(user, userVisits);
 
-            User newUser = users.get(newVisit.getUser());
+            User newUser = users(newVisit.getUser());
             List<Visit> newUserVisits = userVisitsRepo.get(user);
-            newUserVisits.remove(v);
+            newUserVisits.remove(oldVisit);
             userVisitsRepo.appendUserVisits(newUser, newUserVisits);
         }
-//        Location location = locations.get(newVisit.getLocation());
-//        List<Visit> locationVisits = locVisitsRepo.get(location);
-//        locationVisits.add(newVisit);
-//        locVisitsRepo.appendLocationVisits(location, locationVisits);
+        if (newVisit.getLocation() == oldVisit.getLocation()) {
+            Location location = locations(oldVisit.getLocation());
+            List<Visit> locVisits = locVisitsRepo.get(location);
+            locVisits.remove(oldVisit);
+            locVisits.add(newVisit);
+            locVisitsRepo.appendLocationVisits(location, locVisits);
+        } else {
+            Location location = locations(oldVisit.getLocation());
+            List<Visit> locVisits = locVisitsRepo.get(location);
+            locVisits.remove(oldVisit);
+            locVisitsRepo.appendLocationVisits(location, locVisits);
+
+            Location newLocation = locations(newVisit.getLocation());
+            List<Visit> newLocVisits = locVisitsRepo.get(newLocation);
+            newLocVisits.add(newVisit);
+            locVisitsRepo.appendLocationVisits(newLocation, newLocVisits);
+        }
+        oldVisit.update(q.location, q.user, q.visited_at, q.mark);
     }
 }
