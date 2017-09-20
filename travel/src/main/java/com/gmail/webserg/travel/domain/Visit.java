@@ -15,6 +15,13 @@ public class Visit {
         this.mark = mark;
     }
 
+    public void update(Integer location, Integer user, Long visited_at, Integer mark) {
+        if(location != null) this.location = location;
+        if(user != null) this.user = user;
+        if(visited_at != null) this.visited_at = visited_at;
+        if(mark != null) this.mark = mark;
+    }
+
     public int getId() {
         return id;
     }
@@ -72,10 +79,6 @@ public class Visit {
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + location;
-        result = 31 * result + user;
-        result = 31 * result + (int) (visited_at ^ (visited_at >>> 32));
-        result = 31 * result + mark;
         return result;
     }
 }

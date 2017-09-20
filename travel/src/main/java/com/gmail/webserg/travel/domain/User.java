@@ -94,11 +94,6 @@ public final class User {
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + first_name.hashCode();
-        result = 31 * result + last_name.hashCode();
-        result = 31 * result + (int) (birth_date ^ (birth_date >>> 32));
-        result = 31 * result + gender.hashCode();
-        result = 31 * result + email.hashCode();
         return result;
     }
 
