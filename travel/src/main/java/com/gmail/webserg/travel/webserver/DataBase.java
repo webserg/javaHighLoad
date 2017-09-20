@@ -173,9 +173,8 @@ public final class DataBase {
         newUsers.put(newUser.getId(), newUser);
     }
 
-    public void addLocation(LocationPostQueryParam q) {
-        Location newLocation = new Location(q.id, q.country, q.city, q.place, q.distance);
-        newLocations.put(q.id, newLocation);
+    public void addLocation(Location newLocation) {
+        newLocations.put(newLocation.getId(), newLocation);
     }
 
     public void addVisit(VisitPostQueryParam q) {
@@ -195,8 +194,8 @@ public final class DataBase {
         user.update(q);
     }
 
-    public void updateLocation(Location location, LocationPostQueryParam q) {
-        location.update(q.country, q.city, q.place, q.distance);
+    public void updateLocation(Location location, Location newLocation) {
+        location.update(newLocation);
     }
 
     public void updateVisit(Visit oldVisit, VisitPostQueryParam q) {

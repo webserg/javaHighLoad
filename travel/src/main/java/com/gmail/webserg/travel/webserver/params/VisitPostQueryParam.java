@@ -14,4 +14,13 @@ public class VisitPostQueryParam {
         this.visited_at = visited_at;
         this.mark = mark;
     }
+
+    public boolean notNewValid() {
+        return id == null || location == null || user == null || visited_at == null || mark == null;
+
+    }
+    public boolean notUpdateValid() {
+        return id != null;
+
+    }
 }

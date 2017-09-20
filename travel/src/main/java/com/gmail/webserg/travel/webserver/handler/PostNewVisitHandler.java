@@ -2,7 +2,6 @@ package com.gmail.webserg.travel.webserver.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gmail.webserg.travel.webserver.DataBase;
-import com.gmail.webserg.travel.webserver.params.LocationPostQueryParam;
 import com.gmail.webserg.travel.webserver.params.VisitPostQueryParam;
 import com.networknt.config.Config;
 import io.undertow.server.HttpHandler;
@@ -10,45 +9,30 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 
-import java.util.ArrayDeque;
-import java.util.Map;
-import java.util.Optional;
-
 public class PostNewVisitHandler implements HttpHandler {
-    private final ObjectMapper objectMapper = Config.getInstance().getMapper();
+    private final ObjectMapper mapper = Config.getInstance().getMapper();
 
     @Override
     public void handleRequest(HttpServerExchange exch) throws Exception {
-        try {
-            VisitPostQueryParam q = getRequest(exch.getQueryParameters());
-            if (q.id == null || q.location == null || q.user == null || q.mark == null || q.visited_at == null
-                   ) {
-                exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
-                return;
-            }
-            exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-            exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
-            exch.getResponseSender().send("{}");
-            DataBase.getDb().addVisit(q);
+        exch.getRequestReceiver().receiveFullBytes((exchange, data) -> {
+                    try {
+                        VisitPostQueryParam q = mapper.readValue(data, VisitPostQueryParam.class);
+                        if (q.notNewValid() || DataBase.getDb().getVisit(q.id).isPresent()) {
+                            exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
+                            return;
+                        }
+                        exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+                        exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
+                        exch.getResponseSender().send("{}");
+                        DataBase.getDb().addVisit(q);
 
-        } catch (Throwable ex) {
-            exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
+                    } catch (Throwable ex) {
+                        exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
 
-        }
+                    }
+                }
+        );
     }
 
-    private VisitPostQueryParam getRequest(Map q) {
-        Optional<String> tmp = Utils.toString((ArrayDeque<String>) q.get("id"));
-        Integer id = tmp.map(Integer::parseUnsignedInt).orElse(null);
-        tmp = Utils.toString((ArrayDeque<String>) q.get("location"));
-        Integer location = tmp.map(Integer::parseUnsignedInt).orElse(null);
-        tmp = Utils.toString((ArrayDeque<String>) q.get("user"));
-        Integer user = tmp.map(Integer::parseUnsignedInt).orElse(null);
-        tmp = Utils.toString((ArrayDeque<String>) q.get("mark"));
-        Integer mark = tmp.map(Integer::parseUnsignedInt).orElse(null);
-        tmp = Utils.toString((ArrayDeque<String>) q.get("visited_at"));
-        Long visited_at = tmp.map(Long::parseLong).orElse(null);
-        return new VisitPostQueryParam(id, location, user, visited_at, mark);
-    }
 
 }

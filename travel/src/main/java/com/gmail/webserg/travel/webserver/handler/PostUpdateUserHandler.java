@@ -35,6 +35,7 @@ public class PostUpdateUserHandler implements HttpHandler {
             exch.getRequestReceiver().receiveFullBytes((exchange, data) -> {
                 try {
                     User newUser = mapper.readValue(data, User.class);
+                    if(newUser.getGender().length() > 1) throw new IllegalArgumentException();
                     exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
                     exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
                     exch.getResponseSender().send("{}");
