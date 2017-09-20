@@ -20,13 +20,13 @@ public class PostUpdateVisitHandler implements HttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exch) throws Exception {
         try {
-//            Optional<String> tmp = Utils.toString((ArrayDeque<String>) exch.getPathParameters().get("id"));
-//            Integer id = tmp.map(Integer::parseUnsignedInt).orElse(null);
+            Optional<String> tmp = Utils.toString((ArrayDeque<String>) exch.getQueryParameters().get("id"));
+            Integer id = tmp.map(Integer::parseUnsignedInt).orElse(null);
 //            VisitPostQueryParam q = getRequest(exch.getQueryParameters());
-//            if (id == null || q.id != null ) {
-//                exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
-//                return;
-//            }
+            if (id == null  ) {
+                exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
+                return;
+            }
 //            Optional<Visit> visit = DataBase.getDb().getVisit(id);
 //            if(!visit.isPresent()){
 //                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();

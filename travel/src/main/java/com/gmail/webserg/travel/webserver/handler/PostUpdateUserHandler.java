@@ -19,7 +19,7 @@ public class PostUpdateUserHandler implements HttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exch) throws Exception {
         try {
-            Optional<String> tmp = Utils.toString((ArrayDeque<String>) exch.getPathParameters().get("id"));
+            Optional<String> tmp = Utils.toString((ArrayDeque<String>) exch.getQueryParameters().get("id"));
             Integer id = tmp.map(Integer::parseUnsignedInt).orElse(null);
 
             if (id == null) {

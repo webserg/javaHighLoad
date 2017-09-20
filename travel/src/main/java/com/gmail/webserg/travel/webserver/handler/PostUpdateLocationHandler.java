@@ -20,13 +20,12 @@ public class PostUpdateLocationHandler implements HttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exch) throws Exception {
         try {
-//            Optional<String> tmp = Utils.toString((ArrayDeque<String>) exch.getPathParameters().get("id"));
-//            Integer id = tmp.map(Integer::parseUnsignedInt).orElse(null);
-//            LocationPostQueryParam q = PostNewLocationHandler.getRequest(exch.getQueryParameters());
-//            if (id == null || q.id != null) {
-//                exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
-//                return;
-//            }
+            Optional<String> tmp = Utils.toString((ArrayDeque<String>) exch.getQueryParameters().get("id"));
+            Integer id = tmp.map(Integer::parseUnsignedInt).orElse(null);
+            if (id == null) {
+                exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
+                return;
+            }
 //            Optional<Location> location = DataBase.getDb().getLocation(id);
 //            if(!location.isPresent()){
 //                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
