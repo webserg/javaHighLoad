@@ -9,6 +9,9 @@ public class Location {
     transient long visitsPosition;
     transient int visitsSize;
 
+    public Location() {
+    }
+
     public Location(int id, String place, String country, String city, int distance) {
         this.id = id;
         this.place = place;

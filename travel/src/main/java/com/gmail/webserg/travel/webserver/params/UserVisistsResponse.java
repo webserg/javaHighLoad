@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 public class UserVisistsResponse {
     List<UserVisits> visits;
 
+    public UserVisistsResponse() {
+    }
+
     public UserVisistsResponse(List<UserVisits> visits) {
         this.visits = visits.stream().sorted(
                 Comparator.comparingLong(UserVisits::getVisited_at))

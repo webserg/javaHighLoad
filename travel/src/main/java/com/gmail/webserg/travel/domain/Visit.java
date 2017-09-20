@@ -7,6 +7,9 @@ public class Visit {
     long visited_at;
     int mark;
 
+    public Visit() {
+    }
+
     public Visit(int id, int location, int user, long visited_at, int mark) {
         this.id = id;
         this.location = location;

@@ -96,7 +96,7 @@ public final class DataBase {
     }
 
 
-    long getAge(Long bd) {
+    private long getAge(Long bd) {
         return LocalDateTime.ofEpochSecond(bd, 0, ZoneOffset.UTC).until(generationDateTime, YEARS);
     }
 
@@ -140,7 +140,7 @@ public final class DataBase {
             logger.info("users loaded size=" + users.size());
             System.gc();
         } catch (IOException e) {
-            logger.error("users wasn't loaded");
+            logger.error("users wasn't loaded",e);
             users = new ArrayList<>();
         }
         try {
@@ -148,14 +148,15 @@ public final class DataBase {
             logger.info("locations loaded size=" + locations.size());
             System.gc();
         } catch (IOException e) {
-            logger.error("locations wasn't loaded");
+            logger.error("locations wasn't loaded",e);
             locations = new ArrayList<>();
         }
         try {
             visits = new DataLoader<>(Visit[].class, "visits", 1001240).load();
+            logger.info("visits loaded size=" + visits.size());
             System.gc();
         } catch (IOException e) {
-            logger.error("visits wasn't loaded");
+            logger.error("visits wasn't loaded",e);
             visits = new ArrayList<>();
         }
         try {
@@ -168,9 +169,8 @@ public final class DataBase {
         }
     }
 
-    public void addUser(UserPostQueryParam q) {
-        User newUser = new User(q.id, q.first_name, q.last_name, q.birth_date, q.gender, q.email);
-        newUsers.put(q.id, newUser);
+    public void addUser(User newUser) {
+        newUsers.put(newUser.getId(), newUser);
     }
 
     public void addLocation(LocationPostQueryParam q) {
@@ -191,8 +191,8 @@ public final class DataBase {
         locVisitsRepo.appendLocationVisits(location, locationVisits);
     }
 
-    public void updateUser(final User user, UserPostQueryParam q) {
-        user.update(q.first_name, q.last_name, q.birth_date, q.gender, q.email);
+    public void updateUser(final User user, User q) {
+        user.update(q);
     }
 
     public void updateLocation(Location location, LocationPostQueryParam q) {

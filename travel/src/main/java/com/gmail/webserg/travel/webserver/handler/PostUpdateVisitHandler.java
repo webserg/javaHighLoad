@@ -20,22 +20,22 @@ public class PostUpdateVisitHandler implements HttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exch) throws Exception {
         try {
-            Optional<String> tmp = Utils.toString((ArrayDeque<String>) exch.getPathParameters().get("id"));
-            Integer id = tmp.map(Integer::parseUnsignedInt).orElse(null);
-            VisitPostQueryParam q = getRequest(exch.getQueryParameters());
-            if (id == null || q.id != null ) {
-                exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
-                return;
-            }
-            Optional<Visit> visit = DataBase.getDb().getVisit(id);
-            if(!visit.isPresent()){
-                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
-                return;
-            }
+//            Optional<String> tmp = Utils.toString((ArrayDeque<String>) exch.getPathParameters().get("id"));
+//            Integer id = tmp.map(Integer::parseUnsignedInt).orElse(null);
+//            VisitPostQueryParam q = getRequest(exch.getQueryParameters());
+//            if (id == null || q.id != null ) {
+//                exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
+//                return;
+//            }
+//            Optional<Visit> visit = DataBase.getDb().getVisit(id);
+//            if(!visit.isPresent()){
+//                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
+//                return;
+//            }
             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
             exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
             exch.getResponseSender().send("{}");
-            DataBase.getDb().updateVisit(visit.get(), q);
+//            DataBase.getDb().updateVisit(visit.get(), q);
 
         } catch (Throwable ex) {
             exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();

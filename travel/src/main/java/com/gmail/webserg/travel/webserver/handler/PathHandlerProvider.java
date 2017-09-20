@@ -17,11 +17,11 @@ public class PathHandlerProvider implements HandlerProvider {
     @Override
     public HttpHandler getHandler() {
         return Handlers.routing()
-                .add(Methods.GET, "/users/{id}/visits", new GetUserVisitsHandler())
                 .add(Methods.GET, "/users/{id}", new GetUserHandler())
                 .add(Methods.GET, "/locations/{id}", new GetLocationHandler())
-                .add(Methods.GET, "/locations/{id}/avg", new GetLocationAvgHandler())
                 .add(Methods.GET, "/visits/{id}", new GetVisitHandler())
+                .add(Methods.GET, "/users/{id}/visits", new GetUserVisitsHandler())
+                .add(Methods.GET, "/locations/{id}/avg", new GetLocationAvgHandler())
                 .add(Methods.POST, "/users/{id}", new PostUpdateUserHandler())
                 .add(Methods.POST, "/locations/{id}", new PostUpdateLocationHandler())
                 .add(Methods.POST, "/visits/{id}", new PostEntityIdHandler())
