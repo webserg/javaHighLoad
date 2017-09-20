@@ -28,7 +28,7 @@ public class PostUpdateVisitHandler implements HttpHandler {
             exch.getRequestReceiver().receiveFullBytes((exchange, data) -> {
                         try {
                             VisitPostQueryParam q = mapper.readValue(data, VisitPostQueryParam.class);
-                            Optional<Visit> visit = DataBase.getDb().getVisit(q.id);
+                            Optional<Visit> visit = DataBase.getDb().getVisit(id);
                             if (q.notUpdateValid() || !visit.isPresent()) {
                                 exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
                                 return;

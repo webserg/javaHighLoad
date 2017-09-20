@@ -101,7 +101,7 @@ public class UserVisitsRepo {
     boolean appendUserVisits(User user, List<Visit> visits) {
         ObjectMapper mapper = new ObjectMapper();
         Set<OpenOption> options = new HashSet<>();
-        options.add(APPEND);
+        options.add(WRITE);
         Set<PosixFilePermission> perms =
                 PosixFilePermissions.fromString("r--r-----");
         FileAttribute<Set<PosixFilePermission>> attr =
@@ -110,18 +110,18 @@ public class UserVisitsRepo {
             byte data[] = mapper.writeValueAsBytes(visits);
             ByteBuffer out = ByteBuffer.wrap(data);
             long position = fc.size() - 1;
-            long size = out.array().length;
+            int size = out.array().length;
             fc.position(position);
-            FileLock lock = fc.lock(position, size, true);
-            synchronized (user) {
+//            FileLock lock = fc.lock(position, size, true);
+//            synchronized (user) {
                 user.setUserVisitsPosition(position);
-                user.setUserVisitsSize(out.array().length);
-            }
+                user.setUserVisitsSize(size);
+//            }
             try {
                 while (out.hasRemaining())
                     fc.write(out);
             } finally {
-                lock.release();
+//                lock.release();
             }
         } catch (IOException x) {
             System.out.println("I/O Exception: " + x);

@@ -1,11 +1,14 @@
 package com.gmail.webserg.travel.webserver.params;
 
 public class VisitPostQueryParam {
-    public final Integer id;
-    public final Integer location;
-    public final Integer user;
-    public final Long visited_at;
-    public final Integer mark;
+    public  Integer id;
+    public  Integer location;
+    public  Integer user;
+    public  Long visited_at;
+    public  Integer mark;
+
+    public VisitPostQueryParam() {
+    }
 
     public VisitPostQueryParam(Integer id, Integer location, Integer user, Long visited_at, Integer mark) {
         this.id = id;
