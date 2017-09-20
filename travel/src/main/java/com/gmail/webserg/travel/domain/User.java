@@ -11,6 +11,9 @@ public final class User {
     private transient long userVisitsPosition;
     private transient int userVisitsSize;
 
+    public User() {
+    }
+
     public User(int id, String first_name, String last_name, long birth_date, String gender, String email) {
         this.id = id;
         this.first_name = first_name;
@@ -105,11 +108,30 @@ public final class User {
         this.userVisitsSize = userVisitsSize;
     }
 
-    public synchronized void update(String first_name, String last_name, Long birth_date, String gender, String email) {
-        if(first_name != null) this.first_name = first_name;
-        if(last_name != null) this.last_name = last_name;
-        if(birth_date != null) this.birth_date = birth_date;
-        if(gender != null) this.gender = gender;
-        if(email != null) this.email = email;
+    public synchronized void update(User u) {
+        if(first_name != null) this.first_name = u.first_name;
+        if(last_name != null) this.last_name = u.last_name;
+        if(birth_date > 0) this.birth_date = u.birth_date;
+        if(gender != null) this.gender = u.gender;
+        if(email != null) this.email = u.email;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", first_name='" + first_name + '\'' +
+                ", last_name='" + last_name + '\'' +
+                ", birth_date=" + birth_date +
+                ", gender='" + gender + '\'' +
+                ", email='" + email + '\'' +
+                ", userVisitsPosition=" + userVisitsPosition +
+                ", userVisitsSize=" + userVisitsSize +
+                '}';
+    }
+
+    public boolean notValid() {
+        return first_name == null || last_name == null || gender == null || email == null;
+
     }
 }

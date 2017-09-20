@@ -34,9 +34,9 @@ public class UserVisitsRepo {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
     void load(List<User> users, List<Visit> visits) throws Exception {
+        getPath().toFile().createNewFile();
         ObjectMapper mapper = new ObjectMapper();
         Set<OpenOption> options = new HashSet<>();
-        options.add(CREATE_NEW);
         options.add(WRITE);
         Set<PosixFilePermission> perms =
                 PosixFilePermissions.fromString("rw-r-----");

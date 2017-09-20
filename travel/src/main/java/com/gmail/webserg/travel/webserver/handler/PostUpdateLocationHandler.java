@@ -20,22 +20,22 @@ public class PostUpdateLocationHandler implements HttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exch) throws Exception {
         try {
-            Optional<String> tmp = Utils.toString((ArrayDeque<String>) exch.getPathParameters().get("id"));
-            Integer id = tmp.map(Integer::parseUnsignedInt).orElse(null);
-            LocationPostQueryParam q = PostNewLocationHandler.getRequest(exch.getQueryParameters());
-            if (id == null || q.id != null) {
-                exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
-                return;
-            }
-            Optional<Location> location = DataBase.getDb().getLocation(id);
-            if(!location.isPresent()){
-                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
-                return;
-            }
+//            Optional<String> tmp = Utils.toString((ArrayDeque<String>) exch.getPathParameters().get("id"));
+//            Integer id = tmp.map(Integer::parseUnsignedInt).orElse(null);
+//            LocationPostQueryParam q = PostNewLocationHandler.getRequest(exch.getQueryParameters());
+//            if (id == null || q.id != null) {
+//                exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
+//                return;
+//            }
+//            Optional<Location> location = DataBase.getDb().getLocation(id);
+//            if(!location.isPresent()){
+//                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
+//                return;
+//            }
             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
             exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
             exch.getResponseSender().send("{}");
-            DataBase.getDb().updateLocation(location.get(), q);
+//            DataBase.getDb().updateLocation(location.get(), q);
 
         } catch (Throwable ex) {
             exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
