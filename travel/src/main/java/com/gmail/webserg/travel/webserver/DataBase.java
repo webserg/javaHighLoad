@@ -198,50 +198,45 @@ public final class DataBase {
         location.update(newLocation);
     }
 
-    public void updateVisit(Visit oldVisit, VisitPostQueryParam q) {
-        Visit newVisit = new Visit(
-                oldVisit.getId(),
-                q.location == null ? q.location : oldVisit.getLocation(),
-                q.user == null ? q.user : oldVisit.getUser(),
-                q.visited_at == null ? q.visited_at : oldVisit.getVisited_at(),
-                q.mark == null ? q.mark : oldVisit.getMark());
+    public void updateVisit(Visit visit, VisitPostQueryParam queryParam) {
 
-        if (oldVisit.equals(newVisit)) return;
 
-        if (newVisit.getUser() == oldVisit.getUser()) {
-            User user = users(oldVisit.getUser());
+        visit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
+
+        if (queryParam.user == null) {
+            User user = users(visit.getUser());
             List<Visit> userVisits = userVisitsRepo.get(user);
-            userVisits.remove(oldVisit);
-            userVisits.add(newVisit);
+            userVisits.remove(visit);
+            userVisits.add(visit);
             userVisitsRepo.appendUserVisits(user, userVisits);
         } else {
-            User user = users(oldVisit.getUser());
+            User user = users(visit.getUser());
             List<Visit> userVisits = userVisitsRepo.get(user);
-            userVisits.remove(oldVisit);
+            userVisits.remove(visit);
             userVisitsRepo.appendUserVisits(user, userVisits);
 
-            User newUser = users(newVisit.getUser());
+            User newUser = users(queryParam.user);
             List<Visit> newUserVisits = userVisitsRepo.get(user);
-            newUserVisits.remove(oldVisit);
+            newUserVisits.add(visit);
             userVisitsRepo.appendUserVisits(newUser, newUserVisits);
         }
-        if (newVisit.getLocation() == oldVisit.getLocation()) {
-            Location location = locations(oldVisit.getLocation());
+        if (queryParam.location == null) {
+            Location location = locations(visit.getLocation());
             List<Visit> locVisits = locVisitsRepo.get(location);
-            locVisits.remove(oldVisit);
-            locVisits.add(newVisit);
+            locVisits.remove(visit);
+            locVisits.add(visit);
             locVisitsRepo.appendLocationVisits(location, locVisits);
         } else {
-            Location location = locations(oldVisit.getLocation());
+            Location location = locations(visit.getLocation());
             List<Visit> locVisits = locVisitsRepo.get(location);
-            locVisits.remove(oldVisit);
+            locVisits.remove(visit);
             locVisitsRepo.appendLocationVisits(location, locVisits);
 
-            Location newLocation = locations(newVisit.getLocation());
+            Location newLocation = locations(queryParam.location);
             List<Visit> newLocVisits = locVisitsRepo.get(newLocation);
-            newLocVisits.add(newVisit);
+            newLocVisits.add(visit);
             locVisitsRepo.appendLocationVisits(newLocation, newLocVisits);
         }
-        oldVisit.update(q.location, q.user, q.visited_at, q.mark);
+
     }
 }

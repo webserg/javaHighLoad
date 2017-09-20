@@ -72,11 +72,7 @@ public class Visit {
 
         Visit visit = (Visit) o;
 
-        if (id != visit.id) return false;
-        if (location != visit.location) return false;
-        if (user != visit.user) return false;
-        if (visited_at != visit.visited_at) return false;
-        return mark == visit.mark;
+       return id != visit.id;
     }
 
     @Override
