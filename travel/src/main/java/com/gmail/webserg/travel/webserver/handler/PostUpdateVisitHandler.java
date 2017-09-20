@@ -11,50 +11,44 @@ import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 
 import java.util.ArrayDeque;
-import java.util.Map;
 import java.util.Optional;
 
 public class PostUpdateVisitHandler implements HttpHandler {
-    private final ObjectMapper objectMapper = Config.getInstance().getMapper();
+    private final ObjectMapper mapper = Config.getInstance().getMapper();
 
     @Override
     public void handleRequest(HttpServerExchange exch) throws Exception {
         try {
             Optional<String> tmp = Utils.toString((ArrayDeque<String>) exch.getQueryParameters().get("id"));
             Integer id = tmp.map(Integer::parseUnsignedInt).orElse(null);
-//            VisitPostQueryParam q = getRequest(exch.getQueryParameters());
-            if (id == null  ) {
+            if (id == null) {
                 exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
                 return;
             }
-//            Optional<Visit> visit = DataBase.getDb().getVisit(id);
-//            if(!visit.isPresent()){
-//                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
-//                return;
-//            }
-            exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-            exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
-            exch.getResponseSender().send("{}");
-//            DataBase.getDb().updateVisit(visit.get(), q);
+            exch.getRequestReceiver().receiveFullBytes((exchange, data) -> {
+                        try {
+                            VisitPostQueryParam q = mapper.readValue(data, VisitPostQueryParam.class);
+                            Optional<Visit> visit = DataBase.getDb().getVisit(q.id);
+                            if (q.notUpdateValid() || !visit.isPresent()) {
+                                exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
+                                return;
+                            }
+                            exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+                            exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
+                            exch.getResponseSender().send("{}");
+                            DataBase.getDb().updateVisit(visit.get(), q);
 
+                        } catch (Throwable ex) {
+                            exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
+
+                        }
+                    }
+            );
         } catch (Throwable ex) {
             exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
 
         }
     }
 
-    private VisitPostQueryParam getRequest(Map q) {
-        Optional<String> tmp = Utils.toString((ArrayDeque<String>) q.get("id"));
-        Integer id = tmp.map(Integer::parseUnsignedInt).orElse(null);
-        tmp = Utils.toString((ArrayDeque<String>) q.get("location"));
-        Integer location = tmp.map(Integer::parseUnsignedInt).orElse(null);
-        tmp = Utils.toString((ArrayDeque<String>) q.get("user"));
-        Integer user = tmp.map(Integer::parseUnsignedInt).orElse(null);
-        tmp = Utils.toString((ArrayDeque<String>) q.get("mark"));
-        Integer mark = tmp.map(Integer::parseUnsignedInt).orElse(null);
-        tmp = Utils.toString((ArrayDeque<String>) q.get("visited_at"));
-        Long visited_at = tmp.map(Long::parseLong).orElse(null);
-        return new VisitPostQueryParam(id, location, user, visited_at, mark);
-    }
 
 }

@@ -87,11 +87,11 @@ public class Location {
                 '}';
     }
 
-    public synchronized void update(String country, String city, String place, Integer distance) {
-        if(country != null) this.country = country;
-        if(city != null) this.city = city;
-        if(place != null) this.place = place;
-        if(distance != null) this.distance = distance;
+    public synchronized void update(Location l) {
+        if (l.country != null) this.country = l.country;
+        if (l.city != null) this.city = l.city;
+        if (l.place != null) this.place = l.place;
+        if (l.distance != null) this.distance = l.distance;
     }
 
     @Override
@@ -113,5 +113,9 @@ public class Location {
     @Override
     public int hashCode() {
         return id;
+    }
+
+    public boolean notValid() {
+        return (id == null || distance == null || place == null || country == null);
     }
 }
