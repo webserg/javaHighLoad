@@ -24,14 +24,15 @@ public class PostUpdateLocationHandler implements HttpHandler {
                 exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
                 return;
             }
+            Optional<Location> location = DataBase.getDb().getLocation(id);
+            if (!location.isPresent()) {
+                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
+                return;
+            }
             exch.getRequestReceiver().receiveFullBytes((exchange, data) -> {
                         try {
                             Location newLocation = mapper.readValue(data, Location.class);
-                            Optional<Location> location = DataBase.getDb().getLocation(newLocation.getId());
-                            if (!location.isPresent()) {
-                                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
-                                return;
-                            }
+
                             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
                             exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
                             exch.getResponseSender().send("{}");
