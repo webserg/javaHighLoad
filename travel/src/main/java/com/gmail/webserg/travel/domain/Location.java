@@ -1,18 +1,18 @@
 package com.gmail.webserg.travel.domain;
 
 public class Location {
-    int id;
+    Integer id;
     String place;
     String country;
     String city;
-    int distance;
+    Integer distance;
     transient long visitsPosition;
     transient int visitsSize;
 
     public Location() {
     }
 
-    public Location(int id, String place, String country, String city, int distance) {
+    public Location(Integer id, String place, String country, String city, Integer distance) {
         this.id = id;
         this.place = place;
         this.country = country;
@@ -20,11 +20,11 @@ public class Location {
         this.distance = distance;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -52,11 +52,11 @@ public class Location {
         this.city = city;
     }
 
-    public int getDistance() {
+    public Integer getDistance() {
         return distance;
     }
 
-    public void setDistance(int distance) {
+    public void setDistance(Integer distance) {
         this.distance = distance;
     }
 

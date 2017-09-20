@@ -29,6 +29,11 @@ public class GetLocationAvgHandler implements HttpHandler {
                 exch.endExchange();
                 return;
             }
+            if (req.gender != null && req.gender.length() > 1) {
+                exch.setStatusCode(StatusCodes.BAD_REQUEST);
+                exch.endExchange();
+                return;
+            }
             Optional<Location> location = DataBase.getDb().getLocation(req.id);
             if (!location.isPresent()) {
                 exch.setStatusCode(StatusCodes.NOT_FOUND);

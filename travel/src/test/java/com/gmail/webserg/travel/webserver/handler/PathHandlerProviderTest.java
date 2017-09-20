@@ -15,6 +15,7 @@ import io.undertow.client.ClientResponse;
 import io.undertow.util.Methods;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.Assert;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadLocalRandom;
@@ -97,7 +99,7 @@ public class PathHandlerProviderTest {
 
     }
 
-    private void testGetLocationsById(int id) throws ClientException, java.io.IOException {
+    private void testGetLocationsById(Integer id) throws ClientException, java.io.IOException {
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
@@ -247,7 +249,7 @@ public class PathHandlerProviderTest {
     }
 
     @Test
-    public void testPost() throws IOException {
+    public void testPostNewUser() throws IOException {
 
         try {
 
@@ -262,14 +264,14 @@ public class PathHandlerProviderTest {
                     "        \"last_name\": \"Пушкина\",\n" +
                     "        \"gender\": \"f\",\n" +
                     "        \"birth_date\": 365299200\n" +
-                    "    }");
+                    "    }",  Charset.forName("UTF8"));
             input.setContentType("application/json");
-            input.setContentEncoding("UTF8");
+            input.setContentEncoding("UTF-8");
             postRequest.setEntity(input);
 
             HttpResponse response = httpClient.execute(postRequest);
 
-            if (response.getStatusLine().getStatusCode() != 201) {
+            if (response.getStatusLine().getStatusCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : "
                         + response.getStatusLine().getStatusCode());
             }
@@ -285,6 +287,8 @@ public class PathHandlerProviderTest {
 
             httpClient.getConnectionManager().shutdown();
 
+            testGetVisitsById(245000);
+
         } catch (MalformedURLException e) {
 
             e.printStackTrace();
@@ -293,7 +297,118 @@ public class PathHandlerProviderTest {
 
             e.printStackTrace();
 
+        } catch (ClientException e) {
+            e.printStackTrace();
         }
+
+
+    }
+
+    @Test
+    public void testPostUpdateUser() throws IOException, InterruptedException {
+
+        try {
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost postRequest = new HttpPost(
+                    "http://localhost/users/1");
+
+            StringEntity input = new StringEntity("{\n" +
+                    "        \"email\": \"foobar123@mail.ru\",\n" +
+                    "        \"first_name\": \"Маша\",\n" +
+                    "        \"birth_date\": 365299200\n" +
+                    "    }",  Charset.forName("UTF8"));
+            input.setContentType("application/json");
+            input.setContentEncoding("UTF-8");
+            postRequest.setEntity(input);
+
+            HttpResponse response = httpClient.execute(postRequest);
+            Thread.sleep(20);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+            }
+
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader((response.getEntity().getContent())));
+
+            String output;
+            System.out.println("Output from Server .... \n");
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+            }
+
+            httpClient.getConnectionManager().shutdown();
+
+            testGetVisitsById(1);
+
+        } catch (MalformedURLException e) {
+
+            e.printStackTrace();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        } catch (ClientException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+    @Test
+    public void testPostUpdateUser2() throws IOException, InterruptedException {
+
+        try {
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost postRequest = new HttpPost(
+                    "http://localhost/users/2");
+
+            StringEntity input = new StringEntity("{\n" +
+                    "        \"email\": \"foobar123@mail.ru\",\n" +
+                    "        \"first_name\": \"Маша\",\n" +
+                    "        \"last_name\": \"Пушкина\",\n" +
+                    "        \"gender\": \"f\"\n" +
+                    "    }",  Charset.forName("UTF8"));
+            input.setContentType("application/json");
+            input.setContentEncoding("UTF-8");
+            postRequest.setEntity(input);
+
+            HttpResponse response = httpClient.execute(postRequest);
+            Thread.sleep(20);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+            }
+
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader((response.getEntity().getContent())));
+
+            String output;
+            System.out.println("Output from Server .... \n");
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+            }
+
+            httpClient.getConnectionManager().shutdown();
+
+            testGetVisitsById(1);
+
+        } catch (MalformedURLException e) {
+
+            e.printStackTrace();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        } catch (ClientException e) {
+            e.printStackTrace();
+        }
+
 
     }
 }

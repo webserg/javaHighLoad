@@ -2,10 +2,10 @@ package com.gmail.webserg.travel.domain;
 
 
 public final class User {
-    private int id;
+    private Integer id;
     private String first_name;
     private String last_name;
-    private long birth_date;
+    private Long birth_date;
     private String gender;
     private String email;
     private transient long userVisitsPosition;
@@ -14,7 +14,7 @@ public final class User {
     public User() {
     }
 
-    public User(int id, String first_name, String last_name, long birth_date, String gender, String email) {
+    public User(Integer id, String first_name, String last_name, Long birth_date, String gender, String email) {
         this.id = id;
         this.first_name = first_name;
         this.last_name = last_name;
@@ -27,7 +27,7 @@ public final class User {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -47,11 +47,11 @@ public final class User {
         this.last_name = last_name;
     }
 
-    public long getBirth_date() {
+    public Long getBirth_date() {
         return birth_date;
     }
 
-    public void setBirth_date(long birth_date) {
+    public void setBirth_date(Long birth_date) {
         this.birth_date = birth_date;
     }
 
@@ -109,11 +109,11 @@ public final class User {
     }
 
     public synchronized void update(User u) {
-        if(first_name != null) this.first_name = u.first_name;
-        if(last_name != null) this.last_name = u.last_name;
-        if(birth_date > 0) this.birth_date = u.birth_date;
-        if(gender != null) this.gender = u.gender;
-        if(email != null) this.email = u.email;
+        if(u.first_name != null) this.first_name = u.first_name;
+        if(u.last_name != null) this.last_name = u.last_name;
+        if(u.birth_date != null) this.birth_date = u.birth_date;
+        if(u.gender != null) this.gender = u.gender;
+        if(u.email != null) this.email = u.email;
     }
 
     @Override
