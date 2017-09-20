@@ -198,45 +198,47 @@ public final class DataBase {
         location.update(newLocation);
     }
 
-    public void updateVisit(Visit visit, VisitPostQueryParam queryParam) {
+    public void updateVisit(Visit oldVisit, VisitPostQueryParam queryParam) {
 
 
-        visit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
+
 
         if (queryParam.user == null) {
-            User user = users(visit.getUser());
+            User user = users(oldVisit.getUser());
             List<Visit> userVisits = userVisitsRepo.get(user);
-            userVisits.remove(visit);
-            userVisits.add(visit);
+            userVisits.remove(oldVisit);
+            userVisits.add(oldVisit);
             userVisitsRepo.appendUserVisits(user, userVisits);
         } else {
-            User user = users(visit.getUser());
+            User user = users(oldVisit.getUser());
             List<Visit> userVisits = userVisitsRepo.get(user);
-            userVisits.remove(visit);
-            userVisitsRepo.appendUserVisits(user, userVisits);
+//            userVisits.remove(oldVisit);
+//            userVisitsRepo.appendUserVisits(user, userVisits);
 
             User newUser = users(queryParam.user);
-            List<Visit> newUserVisits = userVisitsRepo.get(user);
-            newUserVisits.add(visit);
+            List<Visit> newUserVisits = userVisitsRepo.get(newUser);
+            newUserVisits.add(oldVisit);
             userVisitsRepo.appendUserVisits(newUser, newUserVisits);
         }
         if (queryParam.location == null) {
-            Location location = locations(visit.getLocation());
+            Location location = locations(oldVisit.getLocation());
             List<Visit> locVisits = locVisitsRepo.get(location);
-            locVisits.remove(visit);
-            locVisits.add(visit);
+            locVisits.remove(oldVisit);
+            locVisits.add(oldVisit);
             locVisitsRepo.appendLocationVisits(location, locVisits);
         } else {
-            Location location = locations(visit.getLocation());
+            Location location = locations(oldVisit.getLocation());
             List<Visit> locVisits = locVisitsRepo.get(location);
-            locVisits.remove(visit);
+            locVisits.remove(oldVisit);
             locVisitsRepo.appendLocationVisits(location, locVisits);
 
             Location newLocation = locations(queryParam.location);
             List<Visit> newLocVisits = locVisitsRepo.get(newLocation);
-            newLocVisits.add(visit);
+            newLocVisits.add(oldVisit);
             locVisitsRepo.appendLocationVisits(newLocation, newLocVisits);
         }
+
+        oldVisit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
 
     }
 }
