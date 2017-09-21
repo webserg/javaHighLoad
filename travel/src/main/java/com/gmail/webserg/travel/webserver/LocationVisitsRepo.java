@@ -93,14 +93,14 @@ public class LocationVisitsRepo {
         try (FileChannel fc = (FileChannel.open(getPath(), options))) {
             byte data[] = mapper.writeValueAsBytes(visits);
             int size = data.length;
-            long position = fc.size() - 1;
+            long position = fc.size();
             ByteBuffer out = ByteBuffer.wrap(data);
             fc.position(position);
 //            FileLock lock = fc.lock(position, size, true);
-//            synchronized (location) {
+            synchronized (location) {
                 location.setVisitsPosition(position);
                 location.setVisitsSize(size);
-//            }
+            }
             try {
                 while (out.hasRemaining())
                     fc.write(out);

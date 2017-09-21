@@ -306,6 +306,63 @@ public class PathHandlerProviderTest {
     }
 
     @Test
+    public void testPostNewUserNull() throws IOException {
+
+        try {
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost postRequest = new HttpPost(
+                    "http://localhost/users/new");
+
+            StringEntity input = new StringEntity("{\n" +
+                    "  \"first_name\": null,\n" +
+                    "  \"last_name\": \"Даныкалан\",\n" +
+                    "  \"gender\": \"m\",\n" +
+                    "  \"id\": \"broken\",\n" +
+                    "  \"birth_date\": -739497600,\n" +
+                    "  \"email\": \"noghanactayt@inbox.ru\"\n" +
+                    "}",  Charset.forName("UTF8"));
+            input.setContentType("application/json");
+            input.setContentEncoding("UTF-8");
+            postRequest.setEntity(input);
+
+            HttpResponse response = httpClient.execute(postRequest);
+
+            if (response.getStatusLine().getStatusCode() != 400) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+            }
+
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader((response.getEntity().getContent())));
+
+            String output;
+            System.out.println("Output from Server .... \n");
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+            }
+
+            httpClient.getConnectionManager().shutdown();
+
+            testGetVisitsById(245000);
+
+        } catch (MalformedURLException e) {
+
+            e.printStackTrace();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        } catch (ClientException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+    @Test
     public void testPostUpdateUser() throws IOException, InterruptedException {
 
         try {
