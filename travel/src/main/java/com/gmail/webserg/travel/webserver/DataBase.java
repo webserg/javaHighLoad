@@ -199,10 +199,6 @@ public final class DataBase {
     }
 
     public void updateVisit(Visit oldVisit, VisitPostQueryParam queryParam) {
-
-
-
-
         if (queryParam.user == null) {
             User user = users(oldVisit.getUser());
             List<Visit> userVisits = userVisitsRepo.get(user);

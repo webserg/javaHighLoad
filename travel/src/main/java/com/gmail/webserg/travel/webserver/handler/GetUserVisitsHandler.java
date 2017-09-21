@@ -20,20 +20,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class GetUserVisitsHandler implements HttpHandler {
-    private final ObjectMapper objectMapper = Config.getInstance().getMapper();
-
-    private ByteBuffer getMessage(String message) {
-        ByteBuffer buffer;
-        try {
-            byte[] m = message.getBytes("UTF-8");
-            buffer = ByteBuffer.allocateDirect(m.length);
-            buffer.put(m);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        buffer.flip();
-        return buffer;
-    }
 
     @Override
     public void handleRequest(HttpServerExchange exch) throws Exception {
