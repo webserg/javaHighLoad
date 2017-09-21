@@ -1,5 +1,6 @@
 package com.gmail.webserg.travel.webserver.handler;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gmail.webserg.travel.domain.Visit;
 import com.gmail.webserg.travel.webserver.DataBase;
@@ -11,6 +12,7 @@ import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 
 import java.util.ArrayDeque;
+import java.util.Map;
 import java.util.Optional;
 
 public class PostUpdateVisitHandler implements HttpHandler {
@@ -25,10 +27,16 @@ public class PostUpdateVisitHandler implements HttpHandler {
                 exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
                 return;
             }
+            Optional<Visit> visit = DataBase.getDb().getVisit(id);
+            if (!visit.isPresent()) {
+                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
+                return;
+            }
             exch.getRequestReceiver().receiveFullBytes((exchange, data) -> {
                         try {
+                            if (validation(exch, data)) return;
                             VisitPostQueryParam q = mapper.readValue(data, VisitPostQueryParam.class);
-                            Optional<Visit> visit = DataBase.getDb().getVisit(id);
+
                             if (q.notUpdateValid() || !visit.isPresent()) {
                                 exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
                                 return;
@@ -48,6 +56,17 @@ public class PostUpdateVisitHandler implements HttpHandler {
             exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
 
         }
+    }
+
+    private boolean validation(HttpServerExchange exch, byte[] data) throws java.io.IOException {
+        Map<String, Object> map = mapper.readValue(data, new TypeReference<Map
+                <String, String>>() {
+        });
+        if (map.values().contains(null)) {
+            exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
+            return true;
+        }
+        return false;
     }
 
 
