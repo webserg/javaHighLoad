@@ -19,10 +19,14 @@ public class Visit {
     }
 
     public void update(Integer location, Integer user, Long visited_at, Integer mark) {
-        if(location != null) this.location = location;
-        if(user != null) this.user = user;
-        if(visited_at != null) this.visited_at = visited_at;
-        if(mark != null) this.mark = mark;
+        if (location != null) this.location = location;
+        if (user != null) this.user = user;
+        if (visited_at != null) this.visited_at = visited_at;
+        if (mark != null) this.mark = mark;
+    }
+
+    public Visit copy() {
+        return new Visit(id, location, user, visited_at, mark);
     }
 
     public int getId() {
@@ -72,7 +76,7 @@ public class Visit {
 
         Visit visit = (Visit) o;
 
-       return id != visit.id;
+        return id != visit.id;
     }
 
     @Override

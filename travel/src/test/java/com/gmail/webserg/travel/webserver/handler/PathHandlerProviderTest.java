@@ -538,6 +538,56 @@ public class PathHandlerProviderTest {
                     "  \"visited_at\": 1199182476,\n" +
                     "  \"location\": 797,\n" +
                     "  \"mark\": 289\n" +
+                    "}", Charset.forName("UTF8"));
+            input.setContentType("application/json");
+            input.setContentEncoding("UTF-8");
+            postRequest.setEntity(input);
+
+            HttpResponse response = httpClient.execute(postRequest);
+            Thread.sleep(20);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+            }
+
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader((response.getEntity().getContent())));
+
+            String output;
+            System.out.println("Output from Server .... \n");
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+            }
+
+            httpClient.getConnectionManager().shutdown();
+
+            testGetVisitsById(10000977);
+
+        } catch (MalformedURLException e) {
+
+            e.printStackTrace();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        } catch (ClientException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testPostUpdateVisit2() throws IOException, InterruptedException {
+
+        try {
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost postRequest = new HttpPost(
+                    "http://localhost/visits/10000977");
+
+            StringEntity input = new StringEntity("{\n" +
+                    "  \"visited_at\": 1199182476,\n" +
+                    "  \"mark\": 10000 \n" +
                     "}",  Charset.forName("UTF8"));
             input.setContentType("application/json");
             input.setContentEncoding("UTF-8");

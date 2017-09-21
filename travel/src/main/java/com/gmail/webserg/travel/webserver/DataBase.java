@@ -207,7 +207,9 @@ public final class DataBase {
             User user = users(oldVisit.getUser());
             List<Visit> userVisits = userVisitsRepo.get(user);
             userVisits.remove(oldVisit);
-            userVisits.add(oldVisit);
+            Visit newVisit = oldVisit.copy();
+            newVisit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
+            userVisits.add(newVisit);
             userVisitsRepo.appendUserVisits(user, userVisits);
         } else {
             User user = users(oldVisit.getUser());
@@ -217,14 +219,18 @@ public final class DataBase {
 
             User newUser = users(queryParam.user);
             List<Visit> newUserVisits = userVisitsRepo.get(newUser);
-            newUserVisits.add(oldVisit);
+            Visit newVisit = oldVisit.copy();
+            newVisit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
+            newUserVisits.add(newVisit);
             userVisitsRepo.appendUserVisits(newUser, newUserVisits);
         }
         if (queryParam.location == null) {
             Location location = locations(oldVisit.getLocation());
             List<Visit> locVisits = locVisitsRepo.get(location);
             locVisits.remove(oldVisit);
-            locVisits.add(oldVisit);
+            Visit newVisit = oldVisit.copy();
+            newVisit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
+            locVisits.add(newVisit);
             locVisitsRepo.appendLocationVisits(location, locVisits);
         } else {
             Location location = locations(oldVisit.getLocation());
@@ -234,7 +240,9 @@ public final class DataBase {
 
             Location newLocation = locations(queryParam.location);
             List<Visit> newLocVisits = locVisitsRepo.get(newLocation);
-            newLocVisits.add(oldVisit);
+            Visit newVisit = oldVisit.copy();
+            newVisit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
+            newLocVisits.add(newVisit);
             locVisitsRepo.appendLocationVisits(newLocation, newLocVisits);
         }
 
