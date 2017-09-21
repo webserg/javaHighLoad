@@ -1,6 +1,7 @@
 package com.gmail.webserg.travel.webserver.handler;
 
 import com.gmail.webserg.travel.domain.Visit;
+import org.junit.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,5 +24,9 @@ public class Test {
         System.out.println(map);
         map.remove(3);
         System.out.println(map);
+        Visit v1 = new Visit(1,1,1,1,1);
+        Visit v2 = new Visit(1,1,1,1,1);
+        Assert.assertEquals(v1,v2);
+
     }
 }
