@@ -15,7 +15,6 @@ import io.undertow.client.ClientResponse;
 import io.undertow.util.Methods;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.Assert;
@@ -31,10 +30,14 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 public class PathHandlerProviderTest {
@@ -42,7 +45,7 @@ public class PathHandlerProviderTest {
 
     @Test
     public void getUsers() throws Exception {
-        for (int i = 1; i < 5010; i++)
+        for (int i = 1; i < 1010; i++)
             testGetUserById(ThreadLocalRandom.current().nextInt(1, 100125));
     }
 
@@ -82,7 +85,7 @@ public class PathHandlerProviderTest {
             connection.sendRequest(request, client.createClientCallback(reference, latch));
 
             latch.await();
-
+            Thread.sleep(10);
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(200, statusCode);
@@ -117,9 +120,10 @@ public class PathHandlerProviderTest {
             connection.sendRequest(request, client.createClientCallback(reference, latch));
 
             latch.await();
-
+            Thread.sleep(10);
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            System.out.println("/locations/" + id);
             Assert.assertEquals("/locations/" + id,200, statusCode);
             Assert.assertNotNull(body);
             ObjectMapper mapper = new ObjectMapper();
@@ -152,10 +156,10 @@ public class PathHandlerProviderTest {
             connection.sendRequest(request, client.createClientCallback(reference, latch));
 
             latch.await();
-
+            Thread.sleep(10);
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
-            Assert.assertEquals("/visits/" + id,200, statusCode);
+            Assert.assertEquals("/visits/" + id, 200, statusCode);
             Assert.assertNotNull(body);
             ObjectMapper mapper = new ObjectMapper();
             Visit visit = mapper.readValue(body, Visit.class);
@@ -187,7 +191,7 @@ public class PathHandlerProviderTest {
             connection.sendRequest(request, client.createClientCallback(reference, latch));
 
             latch.await();
-
+            Thread.sleep(10);
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(request.toString(), 200, statusCode);
@@ -265,7 +269,7 @@ public class PathHandlerProviderTest {
                     "        \"last_name\": \"Пушкина\",\n" +
                     "        \"gender\": \"f\",\n" +
                     "        \"birth_date\": 365299200\n" +
-                    "    }",  Charset.forName("UTF8"));
+                    "    }", Charset.forName("UTF8"));
             input.setContentType("application/json");
             input.setContentEncoding("UTF-8");
             postRequest.setEntity(input);
@@ -321,7 +325,7 @@ public class PathHandlerProviderTest {
                     "  \"id\": \"broken\",\n" +
                     "  \"birth_date\": -739497600,\n" +
                     "  \"email\": \"noghanactayt@inbox.ru\"\n" +
-                    "}",  Charset.forName("UTF8"));
+                    "}", Charset.forName("UTF8"));
             input.setContentType("application/json");
             input.setContentEncoding("UTF-8");
             postRequest.setEntity(input);
@@ -375,7 +379,7 @@ public class PathHandlerProviderTest {
                     "        \"email\": \"foobar123@mail.ru\",\n" +
                     "        \"first_name\": \"Маша\",\n" +
                     "        \"birth_date\": 365299200\n" +
-                    "    }",  Charset.forName("UTF8"));
+                    "    }", Charset.forName("UTF8"));
             input.setContentType("application/json");
             input.setContentEncoding("UTF-8");
             postRequest.setEntity(input);
@@ -430,7 +434,7 @@ public class PathHandlerProviderTest {
                     "        \"first_name\": \"Маша\",\n" +
                     "        \"last_name\": \"Пушкина\",\n" +
                     "        \"gender\": \"f\"\n" +
-                    "    }",  Charset.forName("UTF8"));
+                    "    }", Charset.forName("UTF8"));
             input.setContentType("application/json");
             input.setContentEncoding("UTF-8");
             postRequest.setEntity(input);
@@ -485,7 +489,7 @@ public class PathHandlerProviderTest {
                     "  \"visited_at\": 1199182476,\n" +
                     "  \"location\": 796,\n" +
                     "  \"mark\": 3333\n" +
-                    "}",  Charset.forName("UTF8"));
+                    "}", Charset.forName("UTF8"));
             input.setContentType("application/json");
             input.setContentEncoding("UTF-8");
             postRequest.setEntity(input);
@@ -524,6 +528,7 @@ public class PathHandlerProviderTest {
 
 
     }
+
     @Test
     public void testPostUpdateVisit() throws IOException, InterruptedException {
 
@@ -588,7 +593,7 @@ public class PathHandlerProviderTest {
             StringEntity input = new StringEntity("{\n" +
                     "  \"visited_at\": 1199182476,\n" +
                     "  \"mark\": 10000 \n" +
-                    "}",  Charset.forName("UTF8"));
+                    "}", Charset.forName("UTF8"));
             input.setContentType("application/json");
             input.setContentEncoding("UTF-8");
             postRequest.setEntity(input);
@@ -642,7 +647,7 @@ public class PathHandlerProviderTest {
                     " \"mark\": 2,\n" +
                     "  \"user\": 8707,\n" +
                     "  \"location\": 3393" +
-                    "}",  Charset.forName("UTF8"));
+                    "}", Charset.forName("UTF8"));
             input.setContentType("application/json");
             input.setContentEncoding("UTF-8");
             postRequest.setEntity(input);
@@ -689,7 +694,7 @@ public class PathHandlerProviderTest {
 
             StringEntity input = new StringEntity("{\n" +
                     "  \"user\": 8161\n" +
-                    "}",  Charset.forName("UTF8"));
+                    "}", Charset.forName("UTF8"));
             input.setContentType("application/json");
             input.setContentEncoding("UTF-8");
             postRequest.setEntity(input);
@@ -726,7 +731,6 @@ public class PathHandlerProviderTest {
     }
 
 
-
     @Test
     public void testPostUpdateLocation() throws IOException, InterruptedException {
 
@@ -738,7 +742,7 @@ public class PathHandlerProviderTest {
 
             StringEntity input = new StringEntity("{\n" +
                     " \"city\": null" +
-                    "}",  Charset.forName("UTF8"));
+                    "}", Charset.forName("UTF8"));
             input.setContentType("application/json");
             input.setContentEncoding("UTF-8");
             postRequest.setEntity(input);
@@ -788,7 +792,7 @@ public class PathHandlerProviderTest {
                     "  \"user\": 3,\n" +
                     "  \"visited_at\": 1199182476,\n" +
                     "  \"mark\": 10000 \n" +
-                    "}",  Charset.forName("UTF8"));
+                    "}", Charset.forName("UTF8"));
             input.setContentType("application/json");
             input.setContentEncoding("UTF-8");
             postRequest.setEntity(input);
@@ -826,6 +830,26 @@ public class PathHandlerProviderTest {
         }
 
 
+    }
+
+    @Test
+    public void smallTest() {
+        System.out.println("c:\\asdasd\\adasd\\users_10.json".replaceAll("[^0-9]", ""));
+        List<Visit> visits = new ArrayList<>();
+        visits.add(new Visit(1, 1, 1, 1, 1));
+        visits.add(new Visit(2, 1, 1, 2, 1));
+        visits.add(new Visit(3, 1, 1, 3, 1));
+        visits.add(new Visit(4, 1, 1, 4, 1));
+        System.out.println(visits);
+        visits.remove(new Visit(2, 1, 1, 2, 1));
+        System.out.println(visits);
+        Map<Integer, Visit> map = visits.stream().collect(Collectors.toMap(Visit::getId, Function.identity()));
+        System.out.println(map);
+        map.remove(3);
+        System.out.println(map);
+        Visit v1 = new Visit(1, 1, 1, 1, 1);
+        Visit v2 = new Visit(1, 1, 1, 1, 1);
+        Assert.assertEquals(v1, v2);
     }
 
 
