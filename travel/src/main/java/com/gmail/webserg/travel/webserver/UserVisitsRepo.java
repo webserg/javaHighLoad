@@ -1,7 +1,6 @@
 package com.gmail.webserg.travel.webserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gmail.webserg.travel.domain.Location;
 import com.gmail.webserg.travel.domain.User;
 import com.gmail.webserg.travel.domain.Visit;
 import com.gmail.webserg.travel.webserver.handler.Utils;
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -26,7 +24,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.READ;
+import static java.nio.file.StandardOpenOption.WRITE;
 import static java.util.stream.Collectors.groupingBy;
 
 
@@ -52,16 +51,14 @@ public class UserVisitsRepo {
 
             for (User user : users) {
                 if (user == null) continue;
-                if (user.getId() == 7165 || user.getId() == 7164) {
-                    List<Visit> visitsList = userVisits.get(user.getId());
-                    if (visitsList != null) {
-                        byte data[] = mapper.writeValueAsBytes(visitsList);
-                        user.setUserVisitsPosition(fc.position());
-                        user.setUserVisitsSize(data.length);
-                        ByteBuffer out = ByteBuffer.wrap(data);
-                        while (out.hasRemaining()) {
-                            fc.write(out);
-                        }
+                List<Visit> visitsList = userVisits.get(user.getId());
+                if (visitsList != null) {
+                    byte data[] = mapper.writeValueAsBytes(visitsList);
+                    user.setUserVisitsPosition(fc.position());
+                    user.setUserVisitsSize(data.length);
+                    ByteBuffer out = ByteBuffer.wrap(data);
+                    while (out.hasRemaining()) {
+                        fc.write(out);
                     }
                 }
             }
