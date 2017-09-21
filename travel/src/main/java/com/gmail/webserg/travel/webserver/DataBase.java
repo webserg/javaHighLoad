@@ -212,8 +212,8 @@ public final class DataBase {
         } else {
             User user = users(oldVisit.getUser());
             List<Visit> userVisits = userVisitsRepo.get(user);
-//            userVisits.remove(oldVisit);
-//            userVisitsRepo.appendUserVisits(user, userVisits);
+            userVisits.remove(oldVisit);
+            userVisitsRepo.appendUserVisits(user, userVisits);
 
             User newUser = users(queryParam.user);
             List<Visit> newUserVisits = userVisitsRepo.get(newUser);

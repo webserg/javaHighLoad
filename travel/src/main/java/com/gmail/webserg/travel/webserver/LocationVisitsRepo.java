@@ -92,9 +92,9 @@ public class LocationVisitsRepo {
                 PosixFilePermissions.asFileAttribute(perms);
         try (FileChannel fc = (FileChannel.open(getPath(), options))) {
             byte data[] = mapper.writeValueAsBytes(visits);
-            ByteBuffer out = ByteBuffer.wrap(data);
+            int size = data.length;
             long position = fc.size() - 1;
-            int size = out.array().length;
+            ByteBuffer out = ByteBuffer.wrap(data);
             fc.position(position);
 //            FileLock lock = fc.lock(position, size, true);
 //            synchronized (location) {

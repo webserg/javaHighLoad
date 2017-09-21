@@ -52,14 +52,16 @@ public class UserVisitsRepo {
 
             for (User user : users) {
                 if (user == null) continue;
-                List<Visit> visitsList = userVisits.get(user.getId());
-                if (visitsList != null) {
-                    byte data[] = mapper.writeValueAsBytes(visitsList);
-                    user.setUserVisitsPosition(fc.position());
-                    user.setUserVisitsSize(data.length);
-                    ByteBuffer out = ByteBuffer.wrap(data);
-                    while (out.hasRemaining()) {
-                        fc.write(out);
+                if (user.getId() == 7165 || user.getId() == 7164) {
+                    List<Visit> visitsList = userVisits.get(user.getId());
+                    if (visitsList != null) {
+                        byte data[] = mapper.writeValueAsBytes(visitsList);
+                        user.setUserVisitsPosition(fc.position());
+                        user.setUserVisitsSize(data.length);
+                        ByteBuffer out = ByteBuffer.wrap(data);
+                        while (out.hasRemaining()) {
+                            fc.write(out);
+                        }
                     }
                 }
             }
@@ -108,15 +110,15 @@ public class UserVisitsRepo {
                 PosixFilePermissions.asFileAttribute(perms);
         try (FileChannel fc = (FileChannel.open(getPath(), options))) {
             byte data[] = mapper.writeValueAsBytes(visits);
+            int size = data.length;
+            long position = fc.size();
             ByteBuffer out = ByteBuffer.wrap(data);
-            long position = fc.size() - 1;
-            int size = out.array().length;
             fc.position(position);
 //            FileLock lock = fc.lock(position, size, true);
-//            synchronized (user) {
+            synchronized (user) {
                 user.setUserVisitsPosition(position);
                 user.setUserVisitsSize(size);
-//            }
+            }
             try {
                 while (out.hasRemaining())
                     fc.write(out);
