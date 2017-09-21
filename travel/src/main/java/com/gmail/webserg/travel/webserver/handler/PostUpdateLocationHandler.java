@@ -1,5 +1,6 @@
 package com.gmail.webserg.travel.webserver.handler;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gmail.webserg.travel.domain.Location;
 import com.gmail.webserg.travel.webserver.DataBase;
@@ -10,6 +11,7 @@ import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 
 import java.util.ArrayDeque;
+import java.util.Map;
 import java.util.Optional;
 
 public class PostUpdateLocationHandler implements HttpHandler {
@@ -31,6 +33,7 @@ public class PostUpdateLocationHandler implements HttpHandler {
             }
             exch.getRequestReceiver().receiveFullBytes((exchange, data) -> {
                         try {
+                            if (validation(exch, data)) return;
                             Location newLocation = mapper.readValue(data, Location.class);
 
                             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
@@ -49,6 +52,16 @@ public class PostUpdateLocationHandler implements HttpHandler {
             exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
 
         }
+    }
+
+    private boolean validation(HttpServerExchange exch, byte[] data) throws java.io.IOException {
+        Map<String, Object> map = mapper.readValue(data, new TypeReference<Map
+                <String, String>>() { });
+        if (map.values().contains(null)) {
+            exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
+            return true;
+        }
+        return false;
     }
 
 

@@ -36,6 +36,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 
+
 public class PathHandlerProviderTest {
     static final Logger logger = LoggerFactory.getLogger(PathHandlerProviderTest.class);
 
@@ -519,5 +520,153 @@ public class PathHandlerProviderTest {
 
 
     }
+
+
+    @Test
+    public void testPostUpdateVisitNotFound() throws IOException, InterruptedException {
+
+        try {
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost postRequest = new HttpPost(
+                    "http://localhost/visits/287522");
+
+            StringEntity input = new StringEntity("{\n" +
+                    " \"mark\": 2,\n" +
+                    "  \"user\": 8707,\n" +
+                    "  \"location\": 3393" +
+                    "}",  Charset.forName("UTF8"));
+            input.setContentType("application/json");
+            input.setContentEncoding("UTF-8");
+            postRequest.setEntity(input);
+
+            HttpResponse response = httpClient.execute(postRequest);
+            Thread.sleep(20);
+            if (response.getStatusLine().getStatusCode() != 404) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+            }
+
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader((response.getEntity().getContent())));
+
+            String output;
+            System.out.println("Output from Server .... \n");
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+            }
+
+            httpClient.getConnectionManager().shutdown();
+
+
+        } catch (MalformedURLException e) {
+
+            e.printStackTrace();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+    @Test
+    public void testPostUpdateVisitNotFound30115000() throws IOException, InterruptedException {
+
+        try {
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost postRequest = new HttpPost(
+                    "http://localhost/visits/30115000");
+
+            StringEntity input = new StringEntity("{\n" +
+                    "  \"user\": 8161\n" +
+                    "}",  Charset.forName("UTF8"));
+            input.setContentType("application/json");
+            input.setContentEncoding("UTF-8");
+            postRequest.setEntity(input);
+
+            HttpResponse response = httpClient.execute(postRequest);
+            Thread.sleep(20);
+            if (response.getStatusLine().getStatusCode() != 404) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+            }
+
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader((response.getEntity().getContent())));
+
+            String output;
+            System.out.println("Output from Server .... \n");
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+            }
+
+            httpClient.getConnectionManager().shutdown();
+
+
+        } catch (MalformedURLException e) {
+
+            e.printStackTrace();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+
+
+    @Test
+    public void testPostUpdateLocation() throws IOException, InterruptedException {
+
+        try {
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost postRequest = new HttpPost(
+                    "http://localhost/locations/1402");
+
+            StringEntity input = new StringEntity("{\n" +
+                    " \"city\": null" +
+                    "}",  Charset.forName("UTF8"));
+            input.setContentType("application/json");
+            input.setContentEncoding("UTF-8");
+            postRequest.setEntity(input);
+
+            HttpResponse response = httpClient.execute(postRequest);
+            Thread.sleep(20);
+            if (response.getStatusLine().getStatusCode() != 400) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+            }
+
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader((response.getEntity().getContent())));
+
+            String output;
+            System.out.println("Output from Server .... \n");
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+            }
+
+            httpClient.getConnectionManager().shutdown();
+
+
+        } catch (MalformedURLException e) {
+
+            e.printStackTrace();
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        }
+
+
+    }
+
 }
 
