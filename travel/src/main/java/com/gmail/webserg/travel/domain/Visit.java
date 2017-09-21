@@ -73,15 +73,22 @@ public class Visit {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
-        Visit visit = (Visit) o;
-
-        return id != visit.id;
+        return id == ((Visit) o).id;
     }
 
     @Override
     public int hashCode() {
-        int result = id;
-        return result;
+        return id;
+    }
+
+    @Override
+    public String toString() {
+        return "Visit{" +
+                "id=" + id +
+                ", location=" + location +
+                ", user=" + user +
+                ", visited_at=" + visited_at +
+                ", mark=" + mark +
+                '}';
     }
 }
