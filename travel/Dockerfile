@@ -24,14 +24,12 @@ WORKDIR /tmp/hightload
 RUN \
   mkdir /tmp/data 
 ADD ./target/webserver.jar ./webserver.jar
+ADD ./warmUp.sh ./warmUp.sh
 #COPY ./data.zip /tmp/data
 RUN \
   mkdir /tmp/unzipped && \
   export DATA_HOME=/tmp/unzipped
-#RUN \
-#  mkdir -p /data/db && \
-#  ./process.sh
 EXPOSE 80
 
-CMD unzip /tmp/data/data.zip -d /tmp/unzipped && java -server -Xms3488m -Xmx3488m -jar ./webserver.jar
+CMD unzip /tmp/data/data.zip -d /tmp/unzipped && java -server -Xms3488m -Xmx3488m -jar ./webserver.jar && ./warmUp.sh
 
