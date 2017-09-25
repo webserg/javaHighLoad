@@ -30,12 +30,7 @@ public class LocationVisitsRepo {
         getPath().toFile().createNewFile();
         ObjectMapper mapper = new ObjectMapper();
         Set<OpenOption> options = new HashSet<>();
-        options.add(CREATE);
         options.add(WRITE);
-        Set<PosixFilePermission> perms =
-                PosixFilePermissions.fromString("rw-r-----");
-        FileAttribute<Set<PosixFilePermission>> attr =
-                PosixFilePermissions.asFileAttribute(perms);
         try (FileChannel fc = (FileChannel.open(getPath(), options))) {
             fc.position(0);
 
@@ -64,10 +59,6 @@ public class LocationVisitsRepo {
     private byte[] readLocationVisits(Location location) {
         Set<OpenOption> options = new HashSet<>();
         options.add(READ);
-        Set<PosixFilePermission> perms =
-                PosixFilePermissions.fromString("r--r-----");
-        FileAttribute<Set<PosixFilePermission>> attr =
-                PosixFilePermissions.asFileAttribute(perms);
         ByteBuffer copy = ByteBuffer.allocate(location.getVisitsSize());
         try (FileChannel fc = (FileChannel.open(getPath(), options))) {
             fc.position(location.getVisitsPosition());
@@ -86,10 +77,6 @@ public class LocationVisitsRepo {
         ObjectMapper mapper = new ObjectMapper();
         Set<OpenOption> options = new HashSet<>();
         options.add(WRITE);
-        Set<PosixFilePermission> perms =
-                PosixFilePermissions.fromString("r--r-----");
-        FileAttribute<Set<PosixFilePermission>> attr =
-                PosixFilePermissions.asFileAttribute(perms);
         try (FileChannel fc = (FileChannel.open(getPath(), options))) {
             byte data[] = mapper.writeValueAsBytes(visits);
             int size = data.length;

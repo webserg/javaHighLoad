@@ -144,7 +144,8 @@ public class PathHandlerProviderTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, false ? OptionMap.create(UndertowOptions.ENABLE_HTTP2, true) : OptionMap.EMPTY).get();
+            connection = client.connect(new URI("http://localhost"), Http2Client.WORKER, Http2Client.SSL,
+                    Http2Client.POOL, false ? OptionMap.create(UndertowOptions.ENABLE_HTTP2, true) : OptionMap.EMPTY).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
