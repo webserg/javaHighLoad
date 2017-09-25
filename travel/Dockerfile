@@ -28,5 +28,8 @@ RUN \
   export DATA_HOME=/tmp/unzipped
 EXPOSE 80
 
-CMD unzip /tmp/data/data.zip -d /tmp/unzipped && ./jdk-9/bin/java -server -Xms3488m -Xmx3488m -jar ./webserver.jar && ./warmUp.sh
+CMD \
+    unzip /tmp/data/data.zip -d /tmp/unzipped && \
+    ./jdk-9/bin/java -server -Xms3488m -Xmx3488m  -XX:+UseParallelGC -XX:NewSize=1300m -XX:MaxNewSize=1300m -XX:MaxDirectMemorySize=512m -XX:MaxMetaspaceSize=48m -XX:CompressedClassSpaceSize=48m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.lang.Integer.IntegerCache.high=11000000  -jar ./webserver.jar && \
+    ./warmUp.sh
 
