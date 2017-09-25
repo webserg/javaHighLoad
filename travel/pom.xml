@@ -45,11 +45,11 @@
             <artifactId>utility</artifactId>
             <version>${version.framework}</version>
         </dependency>
-        <dependency>
-            <groupId>com.networknt</groupId>
-            <artifactId>security</artifactId>
-            <version>${version.framework}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.networknt</groupId>-->
+            <!--<artifactId>security</artifactId>-->
+            <!--<version>${version.framework}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.networknt</groupId>
             <artifactId>server</artifactId>

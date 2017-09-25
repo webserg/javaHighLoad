@@ -37,10 +37,6 @@ public class UserVisitsRepo {
         ObjectMapper mapper = new ObjectMapper();
         Set<OpenOption> options = new HashSet<>();
         options.add(WRITE);
-        Set<PosixFilePermission> perms =
-                PosixFilePermissions.fromString("rw-r-----");
-        FileAttribute<Set<PosixFilePermission>> attr =
-                PosixFilePermissions.asFileAttribute(perms);
         try (FileChannel fc = (FileChannel.open(getPath(), options))) {
             fc.position(0);
 
@@ -79,10 +75,6 @@ public class UserVisitsRepo {
     private byte[] readUserVisits(User user) {
         Set<OpenOption> options = new HashSet<>();
         options.add(READ);
-        Set<PosixFilePermission> perms =
-                PosixFilePermissions.fromString("r--r-----");
-        FileAttribute<Set<PosixFilePermission>> attr =
-                PosixFilePermissions.asFileAttribute(perms);
         ByteBuffer copy = ByteBuffer.allocate(user.getUserVisitsSize());
         try (FileChannel fc = (FileChannel.open(getPath(), options))) {
             fc.position(user.getUserVisitsPosition());
@@ -101,10 +93,6 @@ public class UserVisitsRepo {
         ObjectMapper mapper = new ObjectMapper();
         Set<OpenOption> options = new HashSet<>();
         options.add(WRITE);
-        Set<PosixFilePermission> perms =
-                PosixFilePermissions.fromString("r--r-----");
-        FileAttribute<Set<PosixFilePermission>> attr =
-                PosixFilePermissions.asFileAttribute(perms);
         try (FileChannel fc = (FileChannel.open(getPath(), options))) {
             byte data[] = mapper.writeValueAsBytes(visits);
             int size = data.length;
@@ -123,7 +111,7 @@ public class UserVisitsRepo {
 //                lock.release();
             }
         } catch (IOException x) {
-            System.out.println("I/O Exception: " + x);
+            logger.error("I/O Exception: " + x);
             return false;
         }
         return true;
