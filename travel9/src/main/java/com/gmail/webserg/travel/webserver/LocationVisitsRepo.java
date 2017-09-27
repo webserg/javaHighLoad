@@ -22,8 +22,8 @@ public class LocationVisitsRepo {
     }
 
     void appendLocationVisits(Visit oldVisit, Visit newVisit) {
-        locVisits.getOrDefault(oldVisit.getLocation(), new ArrayList<>()).removeIf(id -> id.equals(oldVisit.getId()));
-        locVisits.getOrDefault(newVisit.getLocation(), new ArrayList<>()).add(newVisit.getId());
+        locVisits.getOrDefault(oldVisit.getLocation(), new ArrayList<>(1)).removeIf(id -> id.equals(oldVisit.getId()));
+        locVisits.getOrDefault(newVisit.getLocation(), new ArrayList<>(10)).add(newVisit.getId());
     }
 
     List<Integer> get(Location location) {
@@ -31,6 +31,13 @@ public class LocationVisitsRepo {
     }
 
     void add(Location location, Visit newVisit) {
-        locVisits.getOrDefault(location.getId(), new ArrayList<>()).add(newVisit.getId());
+        List<Integer> visits = locVisits.get(location.getId());
+        if(visits == null){
+            List<Integer> newVisits = new ArrayList<>(10);
+            newVisits.add(newVisit.getId());
+        locVisits.put(location.getId(),newVisits);
+        }else{
+            visits.add(newVisit.getId());
+        }
     }
 }
