@@ -558,7 +558,7 @@ public class PathHandlerProviderTest {
 
             httpClient.getConnectionManager().shutdown();
 
-            testGetVisitsById(100977);
+            testGetLocationAvg(796, 60.92982);
 
         } catch (MalformedURLException e) {
 
@@ -612,7 +612,8 @@ public class PathHandlerProviderTest {
 
             httpClient.getConnectionManager().shutdown();
 
-            testGetVisitsById(10000977);
+            testGetLocationAvg(796, 7.52632);
+            testGetLocationAvg(797, 7.35);
 
         } catch (MalformedURLException e) {
 
@@ -626,6 +627,7 @@ public class PathHandlerProviderTest {
             e.printStackTrace();
         }
     }
+
 
     @Test
     public void testPostUpdateVisit2() throws IOException, InterruptedException {
