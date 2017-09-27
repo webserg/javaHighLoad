@@ -218,12 +218,11 @@ public final class DataBase {
             newUserVisits.add(newVisit);
             userVisitsRepo.appendUserVisits(newUser, newUserVisits);
         }
-        if (queryParam.location != null) {
-            Visit newVisit = oldVisit.copy();
-            locVisitsRepo.appendLocationVisits(oldVisit, newVisit);
-        }
-
+        Visit copyOldVisit = oldVisit.copy();
         oldVisit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
+        if (queryParam.location != null) {
+            locVisitsRepo.appendLocationVisits(copyOldVisit, oldVisit);
+        }
 
     }
 }
