@@ -23,19 +23,19 @@ public class LocationVisitsRepo {
 
     void appendLocationVisits(Visit oldVisit, Visit newVisit) {
         locVisits.getOrDefault(oldVisit.getLocation(), new ArrayList<>(1)).removeIf(id -> id.equals(oldVisit.getId()));
-        locVisits.getOrDefault(newVisit.getLocation(), new ArrayList<>(10)).add(newVisit.getId());
+        add(newVisit.getLocation(), newVisit);
     }
 
     List<Integer> get(Location location) {
         return locVisits.getOrDefault(location.getId(), new ArrayList<>());
     }
 
-    void add(Location location, Visit newVisit) {
-        List<Integer> visits = locVisits.get(location.getId());
+    void add(Integer locationId, Visit newVisit) {
+        List<Integer> visits = locVisits.get(locationId);
         if(visits == null){
             List<Integer> newVisits = new ArrayList<>(10);
             newVisits.add(newVisit.getId());
-        locVisits.put(location.getId(),newVisits);
+        locVisits.put(locationId,newVisits);
         }else{
             visits.add(newVisit.getId());
         }

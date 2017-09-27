@@ -181,7 +181,7 @@ public final class DataBase {
         Visit newVisit = new Visit(q.id, q.location, q.user, q.visited_at, q.mark);
         newVisits.put(q.id, newVisit);
         Location location = locations(newVisit.getLocation());
-        locVisitsRepo.add(location, newVisit);
+        locVisitsRepo.add(location.getId(), newVisit);
         User user = users(newVisit.getUser());
         List<Visit> userVisits = userVisitsRepo.get(user);
         userVisits.add(newVisit);
