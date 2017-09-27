@@ -1,12 +1,16 @@
-FROM alpine:3.6
+FROM alpine:edge
 
 # install bash
 RUN \
   apk add --no-cache bash
 
 # install java
-#RUN \
-#  apk add --no-cache openjdk9
+RUN \
+  apk add --no-cache openjdk8
+
+# install jq
+RUN \
+  apk add --no-cache jq
 
 # install zip
 RUN \
@@ -14,22 +18,18 @@ RUN \
 
 RUN \
   mkdir /tmp/hightload
+
+
 WORKDIR /tmp/hightload
 RUN \
   mkdir /tmp/data
-
-COPY ./jdk-9 ./jdk-9
-
 ADD ./target/webserver.jar ./webserver.jar
 ADD ./warmUp.sh ./warmUp.sh
-COPY ./data.zip /tmp/data
+#COPY ./data.zip /tmp/data
 RUN \
   mkdir /tmp/unzipped && \
   export DATA_HOME=/tmp/unzipped
 EXPOSE 80
 
-CMD \
-    unzip /tmp/data/data.zip -d /tmp/unzipped && \
-    ./jdk-9/bin/java -server -Xms3488m -Xmx3488m  -XX:+UseParallelGC -XX:NewSize=1300m -XX:MaxNewSize=1300m -XX:MaxDirectMemorySize=512m -XX:MaxMetaspaceSize=48m -XX:CompressedClassSpaceSize=48m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.lang.Integer.IntegerCache.high=11000000  -jar ./webserver.jar && \
-    ./warmUp.sh
+CMD unzip /tmp/data/data.zip -d /tmp/unzipped && java -server -Xms3488m -Xmx3488m -jar ./webserver.jar && ./warmUp.sh
 
