@@ -22,7 +22,7 @@ public class LocationVisitsRepo {
     }
 
     void appendLocationVisits(Visit oldVisit, Visit newVisit) {
-        locVisits.getOrDefault(oldVisit.getLocation(), new ArrayList<>()).removeIf(integer -> integer.equals(oldVisit.getId()));
+        locVisits.getOrDefault(oldVisit.getLocation(), new ArrayList<>()).removeIf(id -> id.equals(oldVisit.getId()));
         locVisits.getOrDefault(newVisit.getLocation(), new ArrayList<>()).add(newVisit.getId());
     }
 
