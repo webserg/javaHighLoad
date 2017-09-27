@@ -6,8 +6,6 @@ public class Location {
     String country;
     String city;
     Integer distance;
-    transient long visitsPosition;
-    transient int visitsSize;
 
     public Location() {
     }
@@ -60,22 +58,6 @@ public class Location {
         this.distance = distance;
     }
 
-    public void setVisitsPosition(long visitsPosition) {
-        this.visitsPosition = visitsPosition;
-    }
-
-    public void setVisitsSize(int visitsSize) {
-        this.visitsSize = visitsSize;
-    }
-
-    public long getVisitsPosition() {
-        return visitsPosition;
-    }
-
-    public int getVisitsSize() {
-        return visitsSize;
-    }
-
     @Override
     public String toString() {
         return "Location{" +
@@ -103,8 +85,6 @@ public class Location {
 
         if (id != location.id) return false;
         if (distance != location.distance) return false;
-        if (visitsPosition != location.visitsPosition) return false;
-        if (visitsSize != location.visitsSize) return false;
         if (place != null ? !place.equals(location.place) : location.place != null) return false;
         if (country != null ? !country.equals(location.country) : location.country != null) return false;
         return city != null ? city.equals(location.city) : location.city == null;

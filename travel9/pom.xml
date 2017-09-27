@@ -8,7 +8,7 @@
     <artifactId>travel</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>travel</name>
+    <name>travel9</name>
 
     <properties>
         <java.version>1.9</java.version>
