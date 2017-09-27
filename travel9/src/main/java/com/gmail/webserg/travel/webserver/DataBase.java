@@ -77,7 +77,7 @@ public final class DataBase {
     }
 
     public double getLocAvgResult(Location location, LocationAvgRequest req) {
-        List<Visit> userVisits = locVisitsRepo.get(location);
+        List<Visit> userVisits = locVisitsRepo.get(location).stream().map(this::visits).collect(Collectors.toList());
         if (userVisits.size() == 0) return 0.0;
         List<Integer> marks = userVisits.stream()
                 .filter(v -> req.gender == null || req.gender.equalsIgnoreCase(users(v.getUser()).getGender()))
@@ -161,7 +161,7 @@ public final class DataBase {
         }
         try {
             userVisitsRepo.load(users, visits);
-            locVisitsRepo.load(locations, visits);
+            locVisitsRepo.load(visits);
             generationDateTime = userVisitsRepo.readTime();
             System.gc();
         } catch (Exception e) {
@@ -180,14 +180,12 @@ public final class DataBase {
     public void addVisit(VisitPostQueryParam q) {
         Visit newVisit = new Visit(q.id, q.location, q.user, q.visited_at, q.mark);
         newVisits.put(q.id, newVisit);
+        Location location = locations(newVisit.getLocation());
+        locVisitsRepo.add(location, newVisit);
         User user = users(newVisit.getUser());
         List<Visit> userVisits = userVisitsRepo.get(user);
         userVisits.add(newVisit);
         userVisitsRepo.appendUserVisits(user, userVisits);
-        Location location = locations(newVisit.getLocation());
-        List<Visit> locationVisits = locVisitsRepo.get(location);
-        locationVisits.add(newVisit);
-        locVisitsRepo.appendLocationVisits(location, locationVisits);
     }
 
     public void updateUser(final User user, User q) {
@@ -220,26 +218,9 @@ public final class DataBase {
             newUserVisits.add(newVisit);
             userVisitsRepo.appendUserVisits(newUser, newUserVisits);
         }
-        if (queryParam.location == null) {
-            Location location = locations(oldVisit.getLocation());
-            List<Visit> locVisits = locVisitsRepo.get(location);
-            locVisits.remove(oldVisit);
+        if (queryParam.location != null) {
             Visit newVisit = oldVisit.copy();
-            newVisit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
-            locVisits.add(newVisit);
-            locVisitsRepo.appendLocationVisits(location, locVisits);
-        } else {
-            Location location = locations(oldVisit.getLocation());
-            List<Visit> locVisits = locVisitsRepo.get(location);
-            locVisits.remove(oldVisit);
-            locVisitsRepo.appendLocationVisits(location, locVisits);
-
-            Location newLocation = locations(queryParam.location);
-            List<Visit> newLocVisits = locVisitsRepo.get(newLocation);
-            Visit newVisit = oldVisit.copy();
-            newVisit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
-            newLocVisits.add(newVisit);
-            locVisitsRepo.appendLocationVisits(newLocation, newLocVisits);
+            locVisitsRepo.appendLocationVisits(oldVisit, newVisit);
         }
 
         oldVisit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
