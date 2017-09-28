@@ -24,20 +24,20 @@ public class LocationVisitsRepo {
 
     void appendLocationVisits(Visit oldVisit, Visit newVisit) {
         locVisits.getOrDefault(oldVisit.getLocation(), Collections.EMPTY_LIST).removeIf(id -> id.equals(oldVisit.getId()));
-        add(newVisit.getLocation(), newVisit);
+         add(newVisit);
     }
 
     List<Integer> get(Location location) {
         return locVisits.getOrDefault(location.getId(), Collections.EMPTY_LIST);
     }
 
-    void add(Integer locationId, Visit newVisit) {
-        List<Integer> visits = locVisits.get(locationId);
-        if(visits == null){
+    void add(Visit newVisit) {
+        List<Integer> visits = locVisits.get(newVisit.getLocation());
+        if (visits == null) {
             List<Integer> newVisits = new ArrayList<>(10);
             newVisits.add(newVisit.getId());
-        locVisits.put(locationId,newVisits);
-        }else{
+            locVisits.put(newVisit.getLocation(), newVisits);
+        } else {
             visits.add(newVisit.getId());
         }
     }

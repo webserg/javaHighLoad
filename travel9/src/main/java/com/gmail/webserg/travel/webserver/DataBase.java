@@ -67,7 +67,7 @@ public final class DataBase {
     }
 
     public List<UserVisits> getUserVisits(User user, UserVisitsRequest req) {
-        List<Visit> result = userVisitsRepo.get(user);
+        List<Visit> result = userVisitsRepo.get(user).stream().map(this::visits).collect(Collectors.toList());;
         return result.stream().filter(v -> req.country == null || req.country.equals(locations(v.getLocation()).getCountry()))
                 .filter(v -> req.fromDate == null || req.fromDate < v.getVisited_at())
                 .filter(v -> req.toDate == null || req.toDate > v.getVisited_at())
@@ -160,7 +160,7 @@ public final class DataBase {
             visits = new ArrayList<>();
         }
         try {
-            userVisitsRepo.load(users, visits);
+            userVisitsRepo.load(visits);
             locVisitsRepo.load(visits);
             generationDateTime = userVisitsRepo.readTime();
             System.gc();
@@ -180,12 +180,8 @@ public final class DataBase {
     public void addVisit(VisitPostQueryParam q) {
         Visit newVisit = new Visit(q.id, q.location, q.user, q.visited_at, q.mark);
         newVisits.put(q.id, newVisit);
-        Location location = locations(newVisit.getLocation());
-        locVisitsRepo.add(location.getId(), newVisit);
-        User user = users(newVisit.getUser());
-        List<Visit> userVisits = userVisitsRepo.get(user);
-        userVisits.add(newVisit);
-        userVisitsRepo.appendUserVisits(user, userVisits);
+        locVisitsRepo.add(newVisit);
+        userVisitsRepo.add(newVisit);
     }
 
     public void updateUser(final User user, User q) {
@@ -197,32 +193,13 @@ public final class DataBase {
     }
 
     public void updateVisit(Visit oldVisit, VisitPostQueryParam queryParam) {
-        if (queryParam.user == null) {
-            User user = users(oldVisit.getUser());
-            List<Visit> userVisits = userVisitsRepo.get(user);
-            userVisits.remove(oldVisit);
-            Visit newVisit = oldVisit.copy();
-            newVisit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
-            userVisits.add(newVisit);
-            userVisitsRepo.appendUserVisits(user, userVisits);
-        } else {
-            User user = users(oldVisit.getUser());
-            List<Visit> userVisits = userVisitsRepo.get(user);
-            userVisits.remove(oldVisit);
-            userVisitsRepo.appendUserVisits(user, userVisits);
-
-            User newUser = users(queryParam.user);
-            List<Visit> newUserVisits = userVisitsRepo.get(newUser);
-            Visit newVisit = oldVisit.copy();
-            newVisit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
-            newUserVisits.add(newVisit);
-            userVisitsRepo.appendUserVisits(newUser, newUserVisits);
-        }
         Visit copyOldVisit = oldVisit.copy();
         oldVisit.update(queryParam.location, queryParam.user, queryParam.visited_at, queryParam.mark);
         if (queryParam.location != null) {
             locVisitsRepo.appendLocationVisits(copyOldVisit, oldVisit);
         }
-
+        if (queryParam.user != null) {
+            userVisitsRepo.appendUserVisits(copyOldVisit, oldVisit);
+        }
     }
 }
