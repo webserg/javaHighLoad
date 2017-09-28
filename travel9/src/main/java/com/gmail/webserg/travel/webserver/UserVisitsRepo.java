@@ -131,6 +131,6 @@ public class UserVisitsRepo {
         } catch (Throwable e) {
             logger.error(e.getMessage());
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 }
