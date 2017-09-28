@@ -4,6 +4,7 @@ import com.gmail.webserg.travel.domain.Location;
 import com.gmail.webserg.travel.domain.Visit;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,12 +23,12 @@ public class LocationVisitsRepo {
     }
 
     void appendLocationVisits(Visit oldVisit, Visit newVisit) {
-        locVisits.getOrDefault(oldVisit.getLocation(), new ArrayList<>(1)).removeIf(id -> id.equals(oldVisit.getId()));
+        locVisits.getOrDefault(oldVisit.getLocation(), Collections.EMPTY_LIST).removeIf(id -> id.equals(oldVisit.getId()));
         add(newVisit.getLocation(), newVisit);
     }
 
     List<Integer> get(Location location) {
-        return locVisits.getOrDefault(location.getId(), new ArrayList<>());
+        return locVisits.getOrDefault(location.getId(), Collections.EMPTY_LIST);
     }
 
     void add(Integer locationId, Visit newVisit) {
