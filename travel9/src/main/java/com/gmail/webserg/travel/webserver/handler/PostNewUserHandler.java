@@ -25,7 +25,7 @@ public class PostNewUserHandler implements HttpHandler {
                             return;
                         }
                         exch.getResponseHeaders().put(Headers.CONTENT_TYPE, Utils.CONTENT_TYPE);
-                        exch.getResponseSender().send(Utils.POST_ANSWER);
+                        exch.getResponseSender().send(Utils.POST_ANSWER.duplicate());
                         DataBase.getDb().addUser(user);
 
                     } catch (Throwable ex) {

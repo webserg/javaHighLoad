@@ -36,13 +36,12 @@ public class PostUpdateUserHandler implements HttpHandler {
             }
             exch.getRequestReceiver().receiveFullBytes((exchange, data) -> {
                 try {
-                    if (validation(exch, data)) return;
-                    User newUser = mapper.readValue(data, User.class);
-                    if (newUser.getGender() != null && newUser.getGender().length() > 1)
-                        throw new IllegalArgumentException();
+
+                    User newUser = validation(exch, data);
+                    if (newUser == null) return;
                     exch.getResponseHeaders().put(Headers.CONTENT_TYPE, Utils.CONTENT_TYPE);
                     exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, Utils.CHARSET);
-                    exch.getResponseSender().send(Utils.POST_ANSWER);
+                    exch.getResponseSender().send(Utils.POST_ANSWER.duplicate());
                     DataBase.getDb().updateUser(user.get(), newUser);
                 } catch (Throwable ex) {
                     exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
@@ -55,13 +54,36 @@ public class PostUpdateUserHandler implements HttpHandler {
         }
     }
 
-    private boolean validation(HttpServerExchange exch, byte[] data) throws java.io.IOException {
-        Map<String, Object> map = mapper.readValue(data, new TypeReference<Map
-                <String, String>>() { });
+    private User validation(HttpServerExchange exch, byte[] data) throws java.io.IOException {
+        Map<String, String> map = mapper.readValue(data, new TypeReference<Map
+                <String, String>>() {
+        });
         if (map.values().contains(null)) {
             exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
-            return true;
+            return null;
         }
-        return false;
+        User newUser = new User();
+        if (map.get("first_name") != null) {
+            newUser.setFirst_name(map.get("first_name"));
+        }
+        if (map.get("last_name") != null) {
+            newUser.setLast_name(map.get("last_name"));
+        }
+        if (map.get("birth_day") != null) {
+            newUser.setBirth_date(Long.parseLong(map.get("birth_day")));
+        }
+        if (map.get("gender") != null) {
+            String g = map.get("gender");
+            if (g.length() > 1) {
+                exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
+                return null;
+            }
+            newUser.setGender(g);
+        }
+        if (map.get("email") != null) {
+            newUser.setEmail(map.get("email"));
+        }
+
+        return newUser;
     }
 }

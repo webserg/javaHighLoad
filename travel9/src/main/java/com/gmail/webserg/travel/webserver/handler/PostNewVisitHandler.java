@@ -26,7 +26,7 @@ public class PostNewVisitHandler implements HttpHandler {
                         }
                         exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
                         exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
-                        exch.getResponseSender().send(answer);
+                        exch.getResponseSender().send(answer.duplicate());
                         DataBase.getDb().addVisit(q);
 
                     } catch (Throwable ex) {
