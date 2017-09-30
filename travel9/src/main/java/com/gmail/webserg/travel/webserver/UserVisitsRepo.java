@@ -11,10 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,27 +22,27 @@ import static java.util.stream.Collectors.groupingBy;
 public class UserVisitsRepo {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
-    private final Map<Integer, List<Integer>> userVisits = new ConcurrentHashMap<>();
+    private final Map<Integer, Set<Integer>> userVisits = new HashMap<>();
 
     void load(List<Visit> visits) throws Exception {
         visits.stream().skip(1).collect(
                 groupingBy(Visit::getUser)
-        ).forEach((k, v) -> userVisits.put(k, v.stream().map(Visit::getId).collect(Collectors.toList())));
+        ).forEach((k, v) -> userVisits.put(k, v.stream().map(Visit::getId).collect(Collectors.toCollection(TreeSet::new))));
     }
 
     void appendUserVisits(Visit oldVisit, Visit newVisit) {
-        userVisits.getOrDefault(oldVisit.getUser(), Collections.EMPTY_LIST).removeIf(id -> id.equals(oldVisit.getId()));
+        userVisits.getOrDefault(oldVisit.getUser(), Collections.EMPTY_SET).remove(oldVisit.getId());
         add(newVisit);
     }
 
-    List<Integer> get(User user) {
-        return userVisits.getOrDefault(user.getId(), Collections.EMPTY_LIST);
+    Set<Integer> get(User user) {
+        return userVisits.getOrDefault(user.getId(), Collections.EMPTY_SET);
     }
 
     void add(Visit newVisit) {
-        List<Integer> visits = userVisits.get(newVisit.getUser());
+        Set<Integer> visits = userVisits.get(newVisit.getUser());
         if (visits == null) {
-            List<Integer> newVisits = new ArrayList<>(10);
+            Set<Integer> newVisits = new TreeSet<>();
             newVisits.add(newVisit.getId());
             userVisits.put(newVisit.getUser(), newVisits);
         } else {
