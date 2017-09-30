@@ -9,6 +9,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 public class PostNewUserHandler implements HttpHandler {
@@ -23,9 +24,8 @@ public class PostNewUserHandler implements HttpHandler {
                             exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
                             return;
                         }
-                        exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-                        exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
-                        exch.getResponseSender().send("{}");
+                        exch.getResponseHeaders().put(Headers.CONTENT_TYPE, Utils.CONTENT_TYPE);
+                        exch.getResponseSender().send(Utils.POST_ANSWER);
                         DataBase.getDb().addUser(user);
 
                     } catch (Throwable ex) {

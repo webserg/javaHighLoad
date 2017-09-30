@@ -10,6 +10,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.Optional;
@@ -35,10 +36,8 @@ public class PostUpdateLocationHandler implements HttpHandler {
                         try {
                             if (validation(exch, data)) return;
                             Location newLocation = mapper.readValue(data, Location.class);
-
-                            exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-                            exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
-                            exch.getResponseSender().send("{}");
+                            exch.getResponseHeaders().put(Headers.CONTENT_TYPE, Utils.CONTENT_TYPE);
+                            exch.getResponseSender().send(Utils.POST_ANSWER);
                             DataBase.getDb().updateLocation(location.get(), newLocation);
 
                         } catch (Throwable ex) {

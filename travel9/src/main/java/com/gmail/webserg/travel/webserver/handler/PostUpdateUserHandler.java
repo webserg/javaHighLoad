@@ -40,9 +40,9 @@ public class PostUpdateUserHandler implements HttpHandler {
                     User newUser = mapper.readValue(data, User.class);
                     if (newUser.getGender() != null && newUser.getGender().length() > 1)
                         throw new IllegalArgumentException();
-                    exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-                    exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
-                    exch.getResponseSender().send("{}");
+                    exch.getResponseHeaders().put(Headers.CONTENT_TYPE, Utils.CONTENT_TYPE);
+                    exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, Utils.CHARSET);
+                    exch.getResponseSender().send(Utils.POST_ANSWER);
                     DataBase.getDb().updateUser(user.get(), newUser);
                 } catch (Throwable ex) {
                     exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
