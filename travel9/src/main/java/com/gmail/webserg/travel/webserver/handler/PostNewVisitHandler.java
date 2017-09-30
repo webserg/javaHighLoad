@@ -9,8 +9,11 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 
+import java.nio.ByteBuffer;
+
 public class PostNewVisitHandler implements HttpHandler {
     private final ObjectMapper mapper = Config.getInstance().getMapper();
+    private final ByteBuffer answer = ByteBuffer.wrap("{}".getBytes());
 
     @Override
     public void handleRequest(HttpServerExchange exch) throws Exception {
@@ -23,7 +26,7 @@ public class PostNewVisitHandler implements HttpHandler {
                         }
                         exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
                         exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
-                        exch.getResponseSender().send("{}");
+                        exch.getResponseSender().send(answer);
                         DataBase.getDb().addVisit(q);
 
                     } catch (Throwable ex) {

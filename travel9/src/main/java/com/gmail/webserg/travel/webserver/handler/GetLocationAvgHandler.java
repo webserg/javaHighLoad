@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class GetLocationAvgHandler implements HttpHandler {
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void handleRequest(HttpServerExchange exch) throws Exception {
@@ -25,24 +26,20 @@ public class GetLocationAvgHandler implements HttpHandler {
 
             LocationAvgRequest req = getRequest(q);
             if (req.id == null) {
-                exch.setStatusCode(StatusCodes.NOT_FOUND);
-                exch.endExchange();
+                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
                 return;
             }
             if (req.gender != null && req.gender.length() > 1) {
-                exch.setStatusCode(StatusCodes.BAD_REQUEST);
-                exch.endExchange();
+                exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
                 return;
             }
             Optional<Location> location = DataBase.getDb().getLocation(req.id);
             if (!location.isPresent()) {
-                exch.setStatusCode(StatusCodes.NOT_FOUND);
-                exch.endExchange();
+                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
                 return;
             }
             double resp = DataBase.getDb().getLocAvgResult(location.get(), req);
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            final ObjectMapper mapper = new ObjectMapper();
             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
             exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
             mapper.writeValue(out, new LocationAvgResponse(resp));

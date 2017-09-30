@@ -41,9 +41,8 @@ public class PostUpdateVisitHandler implements HttpHandler {
                                 exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
                                 return;
                             }
-                            exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-                            exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
-                            exch.getResponseSender().send("{}");
+                            exch.getResponseHeaders().put(Headers.CONTENT_TYPE, Utils.CONTENT_TYPE);
+                            exch.getResponseSender().send(Utils.POST_ANSWER);
                             DataBase.getDb().updateVisit(visit.get(), q);
 
                         } catch (Throwable ex) {

@@ -54,7 +54,7 @@ public class UserVisitsRepo {
     }
 
     LocalDateTime readTime() {
-        try (Stream<String> stream = Files.lines(Paths.get(Utils.optionsPath + "/options.txt"))) {
+        try (Stream<String> stream = Files.lines(Paths.get(Utils.OPTIONS_PATH + "/options.txt"))) {
             List<String> res = stream.collect(Collectors.toList());
             return LocalDateTime.ofEpochSecond(Long.parseLong(res.get(0)), 0, ZoneOffset.UTC);
         } catch (Throwable e) {

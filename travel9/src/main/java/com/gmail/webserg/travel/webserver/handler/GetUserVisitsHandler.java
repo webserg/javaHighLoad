@@ -20,33 +20,30 @@ import java.util.Map;
 import java.util.Optional;
 
 public class GetUserVisitsHandler implements HttpHandler {
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public void handleRequest(HttpServerExchange exch) throws Exception {
+    public void handleRequest(final HttpServerExchange exch) throws Exception {
         final Map q = exch.getQueryParameters();
         try {
 
-            UserVisitsRequest req = getRequest(q);
+            final UserVisitsRequest req = getRequest(q);
             if (req.id == null) {
-                exch.setStatusCode(StatusCodes.NOT_FOUND);
-                exch.endExchange();
+                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
                 return;
             }
-            Optional<User> user = DataBase.getDb().getUser(req.id);
+            final Optional<User> user = DataBase.getDb().getUser(req.id);
             if (!user.isPresent()) {
-                exch.setStatusCode(StatusCodes.NOT_FOUND);
-                exch.endExchange();
+                exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
                 return;
             }
             List<UserVisits> resp = DataBase.getDb().getUserVisits(user.get(), req);
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            final ObjectMapper mapper = new ObjectMapper();
-            exch.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-            exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, "UTF-8");
-            Object value = new UserVisistsResponse(resp);
-            mapper.writeValue(out, value);
+            mapper.writeValue(out, new UserVisistsResponse(resp));
+
+            exch.getResponseHeaders().put(Headers.CONTENT_TYPE, Utils.CONTENT_TYPE);
+            exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, Utils.CHARSET);
             exch.getResponseSender().send(ByteBuffer.wrap(out.toByteArray()));
-            exch.endExchange();
 
         } catch (NumberFormatException ex) {
             exch.setStatusCode(StatusCodes.BAD_REQUEST);
