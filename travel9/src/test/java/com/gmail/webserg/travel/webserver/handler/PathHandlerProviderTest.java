@@ -5,7 +5,6 @@ import com.gmail.webserg.travel.domain.Location;
 import com.gmail.webserg.travel.domain.User;
 import com.gmail.webserg.travel.domain.UserVisits;
 import com.gmail.webserg.travel.domain.Visit;
-import com.gmail.webserg.travel.webserver.LocationVisitsRepo;
 import com.gmail.webserg.travel.webserver.params.LocationAvgResponse;
 import com.gmail.webserg.travel.webserver.params.UserVisistsResponse;
 import com.networknt.client.Http2Client;
@@ -72,8 +71,8 @@ public class PathHandlerProviderTest {
 
     @Test
     public void testLocationAvg() throws Exception {
-        testGetLocationAvg(2765,2.66667);
-        testGetLocationAvg(3586,2.81818);
+        testGetLocationAvg(2765, 2.66667);
+        testGetLocationAvg(3586, 2.81818);
 //        testGetLocationAvg(2765,2.66667);
     }
 
@@ -133,7 +132,7 @@ public class PathHandlerProviderTest {
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             System.out.println("/locations/" + id);
-            Assert.assertEquals("/locations/" + id,200, statusCode);
+            Assert.assertEquals("/locations/" + id, 200, statusCode);
             Assert.assertNotNull(body);
             ObjectMapper mapper = new ObjectMapper();
             Location location = mapper.readValue(body, Location.class);
@@ -159,17 +158,17 @@ public class PathHandlerProviderTest {
         }
         try {
             logger.info("/locations/" + id);
-            ClientRequest request = new ClientRequest().setPath("/locations/" + id + "avg").setMethod(Methods.GET);
+            ClientRequest request = new ClientRequest().setPath("/locations/" + id + "/avg").setMethod(Methods.GET);
             final AtomicReference<ClientResponse> reference = new AtomicReference<>();
 
             connection.sendRequest(request, client.createClientCallback(reference, latch));
 
             latch.await();
-            Thread.sleep(10);
+            Thread.sleep(100);
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             System.out.println("/locations/" + id);
-            Assert.assertEquals("/locations/" + id,200, statusCode);
+            Assert.assertEquals("/locations/" + id, 200, statusCode);
             Assert.assertNotNull(body);
             ObjectMapper mapper = new ObjectMapper();
             LocationAvgResponse location = mapper.readValue(body, LocationAvgResponse.class);
@@ -437,14 +436,15 @@ public class PathHandlerProviderTest {
                         + response.getStatusLine().getStatusCode());
             }
 
+            String body = new String(response.getEntity().getContent().readAllBytes());
+            System.out.println(body);
+            Assert.assertEquals("{}", body);
+            Assert.assertNotNull(body);
+
             BufferedReader br = new BufferedReader(
                     new InputStreamReader((response.getEntity().getContent())));
 
-            String output;
-            System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                System.out.println(output);
-            }
+
 
             httpClient.getConnectionManager().shutdown();
 
@@ -653,6 +653,7 @@ public class PathHandlerProviderTest {
                         + response.getStatusLine().getStatusCode());
             }
 
+
             BufferedReader br = new BufferedReader(
                     new InputStreamReader((response.getEntity().getContent())));
 
@@ -689,7 +690,7 @@ public class PathHandlerProviderTest {
 
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpPost postRequest = new HttpPost(
-                    "http://localhost/visits/287522");
+                    "http://localhost/visits/28752289");
 
             StringEntity input = new StringEntity("{\n" +
                     " \"mark\": 2,\n" +

@@ -184,7 +184,7 @@ public final class DataBase {
         userVisitsRepo.add(newVisit);
     }
 
-    public void updateUser(final User user, User q) {
+    public void updateUser(final User user, final User q) {
         user.update(q);
     }
 

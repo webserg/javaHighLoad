@@ -42,7 +42,7 @@ public class PostUpdateVisitHandler implements HttpHandler {
                                 return;
                             }
                             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, Utils.CONTENT_TYPE);
-                            exch.getResponseSender().send(Utils.POST_ANSWER);
+                            exch.getResponseSender().send(Utils.POST_ANSWER.duplicate());
                             DataBase.getDb().updateVisit(visit.get(), q);
 
                         } catch (Throwable ex) {

@@ -3,6 +3,9 @@ package com.gmail.webserg.travel.webserver.params;
 public class LocationAvgResponse {
     private Double avg;
 
+    public LocationAvgResponse() {
+    }
+
     public LocationAvgResponse(Double avg) {
         this.avg = avg;
     }

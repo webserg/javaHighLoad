@@ -37,7 +37,7 @@ public class PostUpdateLocationHandler implements HttpHandler {
                             if (validation(exch, data)) return;
                             Location newLocation = mapper.readValue(data, Location.class);
                             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, Utils.CONTENT_TYPE);
-                            exch.getResponseSender().send(Utils.POST_ANSWER);
+                            exch.getResponseSender().send(Utils.POST_ANSWER.duplicate());
                             DataBase.getDb().updateLocation(location.get(), newLocation);
 
                         } catch (Throwable ex) {

@@ -23,7 +23,7 @@ public class PostNewLocationHandler implements HttpHandler {
                                 return;
                             }
                             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, Utils.CONTENT_TYPE);
-                            exch.getResponseSender().send(Utils.POST_ANSWER);
+                            exch.getResponseSender().send(Utils.POST_ANSWER.duplicate());
                             DataBase.getDb().addLocation(location);
 
                         } catch (Throwable ex) {
