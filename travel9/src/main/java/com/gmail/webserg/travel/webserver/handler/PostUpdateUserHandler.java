@@ -69,8 +69,8 @@ public class PostUpdateUserHandler implements HttpHandler {
         if (map.get("last_name") != null) {
             newUser.setLast_name(map.get("last_name"));
         }
-        if (map.get("birth_day") != null) {
-            newUser.setBirth_date(Long.parseLong(map.get("birth_day")));
+        if (map.get("birth_date") != null) {
+            newUser.setBirth_date(Long.parseLong(map.get("birth_date")));
         }
         if (map.get("gender") != null) {
             String g = map.get("gender");
