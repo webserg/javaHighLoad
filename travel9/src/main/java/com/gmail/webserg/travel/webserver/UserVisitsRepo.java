@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.groupingBy;
 public class UserVisitsRepo {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
-    private final Map<Integer, Set<Integer>> userVisits = new HashMap<>();
+    private final Map<Integer, Set<Integer>> userVisits = new ConcurrentHashMap<>();
 
     void load(List<Visit> visits) throws Exception {
         visits.stream().skip(1).collect(
