@@ -1,7 +1,7 @@
 package com.gmail.webserg.travel.webserver.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.gmail.webserg.travel.domain.User;
 import com.gmail.webserg.travel.webserver.DataBase;
 import com.networknt.config.Config;
@@ -15,7 +15,10 @@ import java.util.Map;
 import java.util.Optional;
 
 public class PostUpdateUserHandler implements HttpHandler {
-    private final ObjectMapper mapper = Config.getInstance().getMapper();
+
+    private static final ObjectReader reader = Config.getInstance().getMapper().readerFor(new TypeReference<Map
+                <String, String>>() {
+    });
 
 
     @Override
@@ -55,9 +58,7 @@ public class PostUpdateUserHandler implements HttpHandler {
     }
 
     private User validation(HttpServerExchange exch, byte[] data) throws java.io.IOException {
-        Map<String, String> map = mapper.readValue(data, new TypeReference<Map
-                <String, String>>() {
-        });
+        Map<String, String> map = reader.readValue(data);
         if (map.values().contains(null)) {
             exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
             return null;

@@ -1,7 +1,7 @@
 package com.gmail.webserg.travel.webserver.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.gmail.webserg.travel.domain.Visit;
 import com.gmail.webserg.travel.webserver.DataBase;
 import com.gmail.webserg.travel.webserver.params.VisitPostQueryParam;
@@ -16,7 +16,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public class PostUpdateVisitHandler implements HttpHandler {
-    private final ObjectMapper mapper = Config.getInstance().getMapper();
+    private static final ObjectReader reader = Config.getInstance().getMapper().readerFor(new TypeReference<Map
+            <String, String>>() {
+    });
 
     @Override
     public void handleRequest(HttpServerExchange exch) throws Exception {
@@ -34,8 +36,8 @@ public class PostUpdateVisitHandler implements HttpHandler {
             }
             exch.getRequestReceiver().receiveFullBytes((exchange, data) -> {
                         try {
-                            if (validation(exch, data)) return;
-                            VisitPostQueryParam q = mapper.readValue(data, VisitPostQueryParam.class);
+                            VisitPostQueryParam q = validation(exch, data);
+                            if (q == null) return;
 
                             if (q.notUpdateValid() || !visit.isPresent()) {
                                 exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
@@ -57,15 +59,26 @@ public class PostUpdateVisitHandler implements HttpHandler {
         }
     }
 
-    private boolean validation(HttpServerExchange exch, byte[] data) throws java.io.IOException {
-        Map<String, Object> map = mapper.readValue(data, new TypeReference<Map
-                <String, String>>() {
-        });
+    private VisitPostQueryParam validation(HttpServerExchange exch, byte[] data) throws java.io.IOException {
+        Map<String, String> map = reader.readValue(data);
         if (map.values().contains(null)) {
             exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
-            return true;
+            return null;
         }
-        return false;
+        VisitPostQueryParam newVisit = new VisitPostQueryParam();
+        if (map.get("location") != null) {
+            newVisit.setLocation(Integer.parseUnsignedInt(map.get("location")));
+        }
+        if (map.get("user") != null) {
+            newVisit.setUser(Integer.parseUnsignedInt(map.get("user")));
+        }
+        if (map.get("visited_at") != null) {
+            newVisit.setVisited_at(Long.parseLong(map.get("visited_at")));
+        }
+        if (map.get("mark") != null) {
+            newVisit.setMark(Integer.parseUnsignedInt(map.get("mark")));
+        }
+        return newVisit;
     }
 
 
