@@ -10,7 +10,6 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.Optional;
@@ -34,8 +33,8 @@ public class PostUpdateLocationHandler implements HttpHandler {
             }
             exch.getRequestReceiver().receiveFullBytes((exchange, data) -> {
                         try {
-                            if (validation(exch, data)) return;
-                            Location newLocation = mapper.readValue(data, Location.class);
+                            Location newLocation = validation(exch, data);
+                            if (newLocation == null) return;
                             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, Utils.CONTENT_TYPE);
                             exch.getResponseSender().send(Utils.POST_ANSWER.duplicate());
                             DataBase.getDb().updateLocation(location.get(), newLocation);
@@ -53,14 +52,22 @@ public class PostUpdateLocationHandler implements HttpHandler {
         }
     }
 
-    private boolean validation(HttpServerExchange exch, byte[] data) throws java.io.IOException {
-        Map<String, Object> map = mapper.readValue(data, new TypeReference<Map
-                <String, String>>() { });
+    private Location validation(HttpServerExchange exch, byte[] data) throws java.io.IOException {
+        Map<String, String> map = mapper.readValue(data, new TypeReference<Map
+                <String, String>>() {
+        });
         if (map.values().contains(null)) {
             exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
-            return true;
+            return null;
         }
-        return false;
+        Location newLocation = new Location();
+        newLocation.setCity(map.get("city"));
+        newLocation.setCountry(map.get("country"));
+        if (map.get("distance") != null)
+            newLocation.setDistance(Integer.valueOf(map.get("distance")));
+
+        newLocation.setPlace(map.get("place"));
+        return newLocation;
     }
 
 

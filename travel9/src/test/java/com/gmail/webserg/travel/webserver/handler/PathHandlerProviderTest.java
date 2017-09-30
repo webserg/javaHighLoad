@@ -300,55 +300,50 @@ public class PathHandlerProviderTest {
 
     @Test
     public void testPostNewUser() throws IOException {
+        for (int i = 1; i <= 100; i++) {
 
-        try {
+            try {
 
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpPost postRequest = new HttpPost(
-                    "http://localhost/users/new");
+                DefaultHttpClient httpClient = new DefaultHttpClient();
+                HttpPost postRequest = new HttpPost(
+                        "http://localhost/users/new");
 
-            StringEntity input = new StringEntity("{\n" +
-                    "        \"id\": 245000,\n" +
-                    "        \"email\": \"foobar@mail.ru\",\n" +
-                    "        \"first_name\": \"Маша\",\n" +
-                    "        \"last_name\": \"Пушкина\",\n" +
-                    "        \"gender\": \"f\",\n" +
-                    "        \"birth_date\": 365299200\n" +
-                    "    }", Charset.forName("UTF8"));
-            input.setContentType("application/json");
-            input.setContentEncoding("UTF-8");
-            postRequest.setEntity(input);
+                StringEntity input = new StringEntity("{\n" +
+                        "        \"id\": " + (245000 + i) + ",\n" +
+                        "        \"email\": \"foobar@mail.ru\",\n" +
+                        "        \"first_name\": \"Маша\",\n" +
+                        "        \"last_name\": \"Пушкина\",\n" +
+                        "        \"gender\": \"f\",\n" +
+                        "        \"birth_date\": 365299200\n" +
+                        "    }", Charset.forName("UTF8"));
+                input.setContentType("application/json");
+                input.setContentEncoding("UTF-8");
+                postRequest.setEntity(input);
 
-            HttpResponse response = httpClient.execute(postRequest);
+                HttpResponse response = httpClient.execute(postRequest);
 
-            if (response.getStatusLine().getStatusCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : "
-                        + response.getStatusLine().getStatusCode());
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    throw new RuntimeException("Failed : HTTP error code : "
+                            + response.getStatusLine().getStatusCode());
+                }
+
+                BufferedReader br = new BufferedReader(
+                        new InputStreamReader((response.getEntity().getContent())));
+
+                String output;
+                System.out.println("Output from Server .... \n");
+                while ((output = br.readLine()) != null) {
+                    System.out.println(output);
+                }
+
+                httpClient.getConnectionManager().shutdown();
+                Thread.sleep(20);
+                testGetVisitsById(245000 + i);
+
+
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
-
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader((response.getEntity().getContent())));
-
-            String output;
-            System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                System.out.println(output);
-            }
-
-            httpClient.getConnectionManager().shutdown();
-
-            testGetVisitsById(245000);
-
-        } catch (MalformedURLException e) {
-
-            e.printStackTrace();
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-
-        } catch (ClientException e) {
-            e.printStackTrace();
         }
 
 
@@ -443,7 +438,6 @@ public class PathHandlerProviderTest {
 
             BufferedReader br = new BufferedReader(
                     new InputStreamReader((response.getEntity().getContent())));
-
 
 
             httpClient.getConnectionManager().shutdown();
