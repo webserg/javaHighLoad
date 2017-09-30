@@ -1,6 +1,7 @@
 package com.gmail.webserg.travel.webserver.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.gmail.webserg.travel.domain.User;
 import com.gmail.webserg.travel.domain.UserVisits;
 import com.gmail.webserg.travel.webserver.DataBase;
@@ -20,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class GetUserVisitsHandler implements HttpHandler {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectWriter writer = Config.getInstance().getMapper().writer();
 
     @Override
     public void handleRequest(final HttpServerExchange exch) throws Exception {
@@ -39,7 +40,7 @@ public class GetUserVisitsHandler implements HttpHandler {
             }
             List<UserVisits> resp = DataBase.getDb().getUserVisits(user.get(), req);
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            mapper.writeValue(out, new UserVisistsResponse(resp));
+            writer.writeValue(out, new UserVisistsResponse(resp));
 
             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, Utils.CONTENT_TYPE);
             exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, Utils.CHARSET);

@@ -1,6 +1,6 @@
 package com.gmail.webserg.travel.webserver.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.gmail.webserg.travel.domain.User;
 import com.gmail.webserg.travel.webserver.DataBase;
 import com.networknt.config.Config;
@@ -9,17 +9,14 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-
 public class PostNewUserHandler implements HttpHandler {
-    private final ObjectMapper mapper = Config.getInstance().getMapper();
+    private static final ObjectReader reader = Config.getInstance().getMapper().readerFor(User.class);
 
     @Override
     public void handleRequest(HttpServerExchange exch) throws Exception {
         exch.getRequestReceiver().receiveFullBytes((exchange, data) -> {
                     try {
-                        User user = mapper.readValue(data,User.class);
+                        User user = reader.readValue(data);
                         if (user.notValid() || DataBase.getDb().getUser(user.getId()).isPresent()) {
                             exch.setStatusCode(StatusCodes.BAD_REQUEST).endExchange();
                             return;

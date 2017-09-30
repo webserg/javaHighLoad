@@ -101,7 +101,7 @@ public class PathHandlerProviderTest {
             ObjectMapper mapper = new ObjectMapper();
             User user = mapper.readValue(body, User.class);
             Assert.assertEquals(id, user.getId());
-
+            System.out.println(body);
         } catch (Exception e) {
             logger.error("Exception: ", e);
             throw new ClientException(e);

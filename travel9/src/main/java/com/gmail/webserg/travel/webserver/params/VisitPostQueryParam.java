@@ -10,6 +10,22 @@ public class VisitPostQueryParam {
     public VisitPostQueryParam() {
     }
 
+    public void setLocation(Integer location) {
+        this.location = location;
+    }
+
+    public void setUser(Integer user) {
+        this.user = user;
+    }
+
+    public void setVisited_at(Long visited_at) {
+        this.visited_at = visited_at;
+    }
+
+    public void setMark(Integer mark) {
+        this.mark = mark;
+    }
+
     public VisitPostQueryParam(Integer id, Integer location, Integer user, Long visited_at, Integer mark) {
         this.id = id;
         this.location = location;

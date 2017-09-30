@@ -1,8 +1,7 @@
 package com.gmail.webserg.travel.webserver.handler;
 
 import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gmail.webserg.travel.webserver.params.LocationAvgResponse;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.networknt.config.Config;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -17,8 +16,8 @@ import java.util.Optional;
 
 public abstract class GetEntityIdHandler<T> implements HttpHandler {
 
-    private static final ObjectMapper mapper = Config.getInstance().
-            getMapper().configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true);
+    private static final ObjectWriter writer = Config.getInstance().
+            getMapper().configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true).writer();
 
 
     @Override
@@ -33,10 +32,11 @@ public abstract class GetEntityIdHandler<T> implements HttpHandler {
                 return;
             }
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            mapper.writeValue(out, entity.get());
+            writer.writeValue(out, entity.get());
             exch.getResponseHeaders().put(Headers.CONTENT_TYPE, Utils.CONTENT_TYPE);
             exch.getResponseHeaders().put(Headers.CONTENT_ENCODING, Utils.CHARSET);
             exch.getResponseSender().send(ByteBuffer.wrap(out.toByteArray()));
+            out.close();
         } catch (final NumberFormatException ex) {
             exch.setStatusCode(StatusCodes.NOT_FOUND).endExchange();
         } catch (final Throwable ex) {
