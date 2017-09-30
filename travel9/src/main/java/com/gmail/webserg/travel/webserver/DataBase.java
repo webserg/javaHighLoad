@@ -13,7 +13,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -22,11 +25,11 @@ import static java.time.temporal.ChronoUnit.YEARS;
 public final class DataBase {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
     private List<User> users;
-    private Map<Integer, User> newUsers = new HashMap<>(10, 0.85f);
+    private Map<Integer, User> newUsers = new ConcurrentHashMap<>();
     private List<Location> locations;
-    private Map<Integer, Location> newLocations = new HashMap<>(10,0.85f);
+    private Map<Integer, Location> newLocations = new ConcurrentHashMap<>();
     private List<Visit> visits;
-    private Map<Integer, Visit> newVisits = new HashMap<>(10, 0.85f);
+    private Map<Integer, Visit> newVisits = new ConcurrentHashMap<>();
     private static final DataBase db = new DataBase();
     private final UserVisitsRepo userVisitsRepo = new UserVisitsRepo();
     private final LocationVisitsRepo locVisitsRepo = new LocationVisitsRepo();
