@@ -1,15 +1,18 @@
 package com.gmail.webserg.travelaws.domain;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection = "users")
 public final class User {
+    @Id
+    private String _id;
     private Integer id;
     private String first_name;
     private String last_name;
     private Long birth_date;
     private String gender;
     private String email;
-    private transient long userVisitsPosition;
-    private transient int userVisitsSize;
 
     public User() {
     }
@@ -71,14 +74,6 @@ public final class User {
         this.email = email;
     }
 
-    public long getUserVisitsPosition() {
-        return userVisitsPosition;
-    }
-
-    public void setUserVisitsPosition(long userVisitsPosition) {
-        this.userVisitsPosition = userVisitsPosition;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -100,13 +95,6 @@ public final class User {
         return result;
     }
 
-    public int getUserVisitsSize() {
-        return userVisitsSize;
-    }
-
-    public void setUserVisitsSize(int userVisitsSize) {
-        this.userVisitsSize = userVisitsSize;
-    }
 
     public synchronized void update(User u) {
         if(u.first_name != null) this.first_name = u.first_name;
@@ -125,8 +113,6 @@ public final class User {
                 ", birth_date=" + birth_date +
                 ", gender='" + gender + '\'' +
                 ", email='" + email + '\'' +
-                ", userVisitsPosition=" + userVisitsPosition +
-                ", userVisitsSize=" + userVisitsSize +
                 '}';
     }
 

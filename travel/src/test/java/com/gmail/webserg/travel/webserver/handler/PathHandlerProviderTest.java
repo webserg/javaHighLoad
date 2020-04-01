@@ -5,6 +5,7 @@ import com.gmail.webserg.travel.domain.Location;
 import com.gmail.webserg.travel.domain.User;
 import com.gmail.webserg.travel.domain.UserVisits;
 import com.gmail.webserg.travel.domain.Visit;
+import com.gmail.webserg.travel.webserver.params.LocationAvgResponse;
 import com.gmail.webserg.travel.webserver.params.UserVisistsResponse;
 import com.networknt.client.Http2Client;
 import com.networknt.exception.ClientException;
@@ -93,6 +94,42 @@ public class PathHandlerProviderTest {
             ObjectMapper mapper = new ObjectMapper();
             User user = mapper.readValue(body, User.class);
             Assert.assertEquals(id, user.getId());
+
+        } catch (Exception e) {
+            logger.error("Exception: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+
+    }
+
+    private void testGetLocationAvg(Integer id, Double avg) throws ClientException, java.io.IOException {
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, false ? OptionMap.create(UndertowOptions.ENABLE_HTTP2, true) : OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+        try {
+            logger.info("/locations/" + id);
+            ClientRequest request = new ClientRequest().setPath("/locations/" + id + "/avg").setMethod(Methods.GET);
+            final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+
+            connection.sendRequest(request, client.createClientCallback(reference, latch));
+
+            latch.await();
+            Thread.sleep(10);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            System.out.println("/locations/" + id);
+            Assert.assertEquals("/locations/" + id,200, statusCode);
+            Assert.assertNotNull(body);
+            ObjectMapper mapper = new ObjectMapper();
+            LocationAvgResponse location = mapper.readValue(body, LocationAvgResponse.class);
+            Assert.assertEquals(avg, location.getAvg());
 
         } catch (Exception e) {
             logger.error("Exception: ", e);
@@ -513,7 +550,7 @@ public class PathHandlerProviderTest {
 
             httpClient.getConnectionManager().shutdown();
 
-            testGetVisitsById(100977);
+            testGetLocationAvg(796, 60.92982);
 
         } catch (MalformedURLException e) {
 
@@ -567,7 +604,8 @@ public class PathHandlerProviderTest {
 
             httpClient.getConnectionManager().shutdown();
 
-            testGetVisitsById(10000977);
+            testGetLocationAvg(796, 7.52632);
+            testGetLocationAvg(797, 7.35);
 
         } catch (MalformedURLException e) {
 

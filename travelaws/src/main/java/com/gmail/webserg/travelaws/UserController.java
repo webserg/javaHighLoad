@@ -14,6 +14,7 @@ public class UserController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public User getUser(@PathVariable("id") Integer id) {
-        return userRepository.findOne(id);
+        userRepository.findAll();
+        return userRepository.findById(id);
     }
 }

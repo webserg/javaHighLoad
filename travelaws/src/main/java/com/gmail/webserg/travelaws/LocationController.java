@@ -1,20 +1,19 @@
 package com.gmail.webserg.travelaws;
 
-import com.gmail.webserg.travelaws.domain.User;
+import com.gmail.webserg.travelaws.domain.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
-public class UserController {
+@RequestMapping("/location")
+public class LocationController {
     @Autowired
-    private UserRepository userRepository;
+    private LocationRepository locationRepository;
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public User getUser(@PathVariable("id") Integer id) {
-        userRepository.findAll();
-        return userRepository.findById(id);
+    public Location getLocation(@PathVariable("id") Integer id) {
+        return locationRepository.findOne(id);
     }
 }
