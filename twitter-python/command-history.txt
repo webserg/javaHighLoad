@@ -1,0 +1,8 @@
+virtualenv venv
+source venv/bin/activate
+pip install flask
+docker build -t twitter-python:v0.1 ./
+sudo docker run -d -p 5000:5000 twitter_python:v0.1
+sudo docker images
+docker ps -a
+docker-machine ls

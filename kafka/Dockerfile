@@ -19,20 +19,12 @@ RUN \
 RUN \
   mkdir /tmp/hightload
 
-<<<<<<< HEAD
-
-=======
->>>>>>> f7e6f627c32ec51bf2bb0252255127b03416e3d4
 WORKDIR /tmp/hightload
 RUN \
   mkdir /tmp/data
 ADD ./target/webserver.jar ./webserver.jar
 ADD ./warmUp.sh ./warmUp.sh
-<<<<<<< HEAD
-#COPY ./data.zip /tmp/data
-=======
 COPY ./data.zip /tmp/data
->>>>>>> f7e6f627c32ec51bf2bb0252255127b03416e3d4
 RUN \
   mkdir /tmp/unzipped && \
   export DATA_HOME=/tmp/unzipped

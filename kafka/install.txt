@@ -1,0 +1,24 @@
+ sudo apt-get update
+ sudo apt-get install zookeeperd
+ Systemd это демон инициации других демонов Linux. Systemd полностью поддерживается в Ubuntu 15.04 и старше.
+ sudo systemctl status zookeeper
+ sudo apt-get install net-tools
+ Now you can run the following command to check whether zookeeper is running on port 2181.
+ sudo netstat -tulpen | grep 2181
+ /usr/share/zookeeper/bin/zkCli.sh -server 127.0.0.1:2181
+
+
+sudo tar -xvf kafka_2.10-0.10.0.1.tgz -C /opt/Kafka/
+
+sudo  /opt/Kafka/kafka_2.10-0.10.0.1/bin/kafka-server-start.sh /opt/Kafka/kafka_2.10-0.10.0.1/config/server.properties
+
+run
+ sudo nohup /opt/Kafka/kafka_2.10-0.10.0.1/bin/kafka-server-start.sh /opt/Kafka/kafka_2.10-0.10.0.1/config/server.properties /tmp/kafka.log 2>&1 &
+
+ testing 
+
+sudo /opt/Kafka/kafka_2.11-2.0.0/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1  --partitions 1 --topic testing
+
+sudo /opt/Kafka/kafka_2.11-2.0.0/bin/kafka-topics.sh --list --zookeeper localhost:2181
+
+sudo /opt/Kafka/kafka_2.11-2.0.0/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic testing --from-beginning

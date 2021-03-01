@@ -1,15 +1,28 @@
 package com.gmail.webserg.travelaws.domain;
 
+<<<<<<< HEAD
 
 public final class User {
+=======
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "users")
+public final class User {
+    @Id
+    private String _id;
+>>>>>>> f7e6f627c32ec51bf2bb0252255127b03416e3d4
     private Integer id;
     private String first_name;
     private String last_name;
     private Long birth_date;
     private String gender;
     private String email;
+<<<<<<< HEAD
     private transient long userVisitsPosition;
     private transient int userVisitsSize;
+=======
+>>>>>>> f7e6f627c32ec51bf2bb0252255127b03416e3d4
 
     public User() {
     }
@@ -71,6 +84,7 @@ public final class User {
         this.email = email;
     }
 
+<<<<<<< HEAD
     public long getUserVisitsPosition() {
         return userVisitsPosition;
     }
@@ -79,6 +93,8 @@ public final class User {
         this.userVisitsPosition = userVisitsPosition;
     }
 
+=======
+>>>>>>> f7e6f627c32ec51bf2bb0252255127b03416e3d4
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -100,6 +116,7 @@ public final class User {
         return result;
     }
 
+<<<<<<< HEAD
     public int getUserVisitsSize() {
         return userVisitsSize;
     }
@@ -107,6 +124,8 @@ public final class User {
     public void setUserVisitsSize(int userVisitsSize) {
         this.userVisitsSize = userVisitsSize;
     }
+=======
+>>>>>>> f7e6f627c32ec51bf2bb0252255127b03416e3d4
 
     public synchronized void update(User u) {
         if(u.first_name != null) this.first_name = u.first_name;
@@ -125,8 +144,11 @@ public final class User {
                 ", birth_date=" + birth_date +
                 ", gender='" + gender + '\'' +
                 ", email='" + email + '\'' +
+<<<<<<< HEAD
                 ", userVisitsPosition=" + userVisitsPosition +
                 ", userVisitsSize=" + userVisitsSize +
+=======
+>>>>>>> f7e6f627c32ec51bf2bb0252255127b03416e3d4
                 '}';
     }
 
