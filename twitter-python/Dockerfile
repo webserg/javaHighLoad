@@ -1,12 +1,6 @@
-FROM ubuntu:16.04
-
-RUN apt-get update -y && \
-    apt-get install -y python-pip python-dev
+FROM python:3
+RUN apt-get update -y && apt-get install -y build-essential
+ADD ./app.py ./app.py
+ADD ./requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
-
-COPY . /twitter-python.py
-COPY . /requirements.txt
-
-ENTRYPOINT ['python']
-CMD ['twitter-python.py']
-EXPOSE 8080
+CMD ["python","app.py"]
