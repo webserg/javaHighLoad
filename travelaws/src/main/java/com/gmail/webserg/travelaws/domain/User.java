@@ -1,28 +1,15 @@
 package com.gmail.webserg.travelaws.domain;
 
-<<<<<<< HEAD
 
 public final class User {
-=======
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-@Document(collection = "users")
-public final class User {
-    @Id
-    private String _id;
->>>>>>> f7e6f627c32ec51bf2bb0252255127b03416e3d4
     private Integer id;
     private String first_name;
     private String last_name;
     private Long birth_date;
     private String gender;
     private String email;
-<<<<<<< HEAD
     private transient long userVisitsPosition;
     private transient int userVisitsSize;
-=======
->>>>>>> f7e6f627c32ec51bf2bb0252255127b03416e3d4
 
     public User() {
     }
@@ -84,7 +71,6 @@ public final class User {
         this.email = email;
     }
 
-<<<<<<< HEAD
     public long getUserVisitsPosition() {
         return userVisitsPosition;
     }
@@ -93,67 +79,4 @@ public final class User {
         this.userVisitsPosition = userVisitsPosition;
     }
 
-=======
->>>>>>> f7e6f627c32ec51bf2bb0252255127b03416e3d4
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        User user = (User) o;
-
-        if (id != user.id) return false;
-        if (birth_date != user.birth_date) return false;
-        if (!first_name.equals(user.first_name)) return false;
-        if (!last_name.equals(user.last_name)) return false;
-        if (!gender.equals(user.gender)) return false;
-        return email.equals(user.email);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id;
-        return result;
-    }
-
-<<<<<<< HEAD
-    public int getUserVisitsSize() {
-        return userVisitsSize;
-    }
-
-    public void setUserVisitsSize(int userVisitsSize) {
-        this.userVisitsSize = userVisitsSize;
-    }
-=======
->>>>>>> f7e6f627c32ec51bf2bb0252255127b03416e3d4
-
-    public synchronized void update(User u) {
-        if(u.first_name != null) this.first_name = u.first_name;
-        if(u.last_name != null) this.last_name = u.last_name;
-        if(u.birth_date != null) this.birth_date = u.birth_date;
-        if(u.gender != null) this.gender = u.gender;
-        if(u.email != null) this.email = u.email;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", first_name='" + first_name + '\'' +
-                ", last_name='" + last_name + '\'' +
-                ", birth_date=" + birth_date +
-                ", gender='" + gender + '\'' +
-                ", email='" + email + '\'' +
-<<<<<<< HEAD
-                ", userVisitsPosition=" + userVisitsPosition +
-                ", userVisitsSize=" + userVisitsSize +
-=======
->>>>>>> f7e6f627c32ec51bf2bb0252255127b03416e3d4
-                '}';
-    }
-
-    public boolean notValid() {
-        return first_name == null || last_name == null || gender == null || email == null;
-
-    }
 }
